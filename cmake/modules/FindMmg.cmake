@@ -1,0 +1,45 @@
+FIND_PATH(MMG_INCLUDE_DIR
+  NAMES libmmg.h
+  HINTS ${MMG_INCLUDE_DIR}
+  $ENV{MMG_INCLUDE_DIR}
+  $ENV{MMG_DIR}/
+  /usr/local/
+  PATH_SUFFIXES mmg include/mmg/
+  DOC "Directory of MMG Header")
+
+FIND_PATH(MMG2D_SRC_DIR
+  NAMES mmg2d.h
+  HINTS ${MMG2D_SRC_DIR}
+  $ENV{MMG2D_SRC_DIR}
+  $ENV{MMG_DIR}/
+  PATH_SUFFIXES src/mmg2d/
+  DOC "Directory of MMG2D sources")
+
+FIND_PATH(MMG3D_SRC_DIR
+  NAMES mmg3d.h
+  HINTS ${MMG3D_SRC_DIR}
+  $ENV{MMG3D_SRC_DIR}
+  $ENV{MMG_DIR}/
+  PATH_SUFFIXES src/mmg3d/
+  DOC "Directory of MMG3D sources")
+
+# Check for mmg
+FIND_LIBRARY(MMG_LIBRARY
+  NAMES mmg${MMG_LIB_SUFFIX}
+  PATH ${MMG_LIBRARY}
+  $ENV{MMG_LIBRARY}
+  ${MMG_DIR}/lib
+  $ENV{MMG_DIR}/lib
+  /usr/local 
+  PATH_SUFFIXES lib
+  DOC "The MMG library"
+  )
+
+
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(MMG DEFAULT_MSG
+				  MMG_INCLUDE_DIR
+				  MMG_LIBRARY )
+IF ((NOT WIN32) AND (NOT WIN64))
+  MARK_AS_ADVANCED(MMG_INCLUDE_DIR  MMG_LIBRARY)
+ENDIF()
