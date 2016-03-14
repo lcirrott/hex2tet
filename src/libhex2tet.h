@@ -16,7 +16,7 @@
 #define H2T_STR   "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
 
 
-#include "mmg/mmg3d/libmmg3d.h"
+#include "mmg3d/libmmg3d.h"
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
