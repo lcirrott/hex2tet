@@ -21,6 +21,9 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h> 
+#define  MG_NUL       (1 << 6) 
+
 /**
  * \def H2T_SUCCESS
  *
