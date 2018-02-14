@@ -8,7 +8,7 @@ PROJECT (hex2tet)
 #####
 ###############################################################################
 SET (CMAKE_RELEASE_VERSION_MAJOR "0")
-SET (CMAKE_RELEASE_VERSION_MINOR "0")
+SET (CMAKE_RELEASE_VERSION_MINOMMGR "0")
 SET (CMAKE_RELEASE_VERSION_PATCH "0")
 SET (CMAKE_RELEASE_DATE "July 2, 2015")
 
@@ -94,21 +94,22 @@ ENDIF()
   SET(MMG_DIR "" CACHE PATH "Installation directory for mmg")
   INCLUDE(cmake/modules/FindMmg.cmake)
 
+  INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/mmg/)
 
-  IF(MMG_FOUND)
-      # Set flags for building test program
+
+  IF(NOT MMG_DIR)
+    MESSAGE ( FATAL_ERROR "ERROR: The installation directory for mmg is required:"
+      "(see https://github.com/MmgTools/mmg and  download the branch develop)."
+      "If you have already installed Mmg and want to use it, "
+      "please set the CMake variable or environment variable MMG_DIR "
+      "to your mmg directory.")     # Set flags for building test program
+  ELSE ( )
       INCLUDE_DIRECTORIES(${MMG_INCLUDE_DIR})
     
       SET(CMAKE_REQUIRED_INCLUDES ${MMG_INCLUDE_DIR})
 
       SET( LIBRARIES ${MMG_LIBRARY} ${LIBRARIES})
- 
-  ELSE ( )
-    MESSAGE ( WARNING "Mmg library not found:"
-      "(see https://github.com/MmgTools/mmg and  download the branch develop)."
-      "If you have already installed Mmg and want to use it, "
-      "please set the CMake variable or environment variable MMG_DIR "
-      "to your mmg directory.")
+
   ENDIF ( )
 
  ############################################################################
