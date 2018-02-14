@@ -35,11 +35,12 @@ int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,char *filename) {
     } else if(!strncmp(chaine,"Vertices",strlen("Vertices"))) {
       fscanf(inm,"%d",&np);
       fprintf(stdout,"  READING %d VERTICES\n",np);
-      if ( MMG3D_Set_meshSize(mmgMesh,np,0,0,0) != 1 )  exit(EXIT_FAILURE);
+      if ( MMG3D_Set_meshSize(mmgMesh,np,0,0,0,0,0) != 1 )  exit(EXIT_FAILURE);
       for (k=1; k<=np; k++) {
       	fscanf(inm,"%lf %lf %lf %d",&x,&y,&z,&ref);
 	if ( MMG3D_Set_vertex(mmgMesh,x  ,y  ,z  ,ref,  k) != 1 )  exit(EXIT_FAILURE);
-	mmgMesh->point[k].tag &= ~MG_NUL;
+
+	mmgMesh->point[k].tag = 0;//&= ~MG_NUL;
       }
       continue;
     } else if(!strncmp(chaine,"Hexahedra",strlen("Hexahedra"))) {
