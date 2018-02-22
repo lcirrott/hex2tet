@@ -6,7 +6,7 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   int     i,nu1,nu2,iel;
 
   if(mesh->ne+1 >= mesh->nemax) {
-    fprintf(stdout,"mem problem = change mmg API\n");
+    fprintf(stdout,"mem problem = change mmg API -- %d >= %d\n",mesh->ne+1,mesh->nemax);
     exit(0);
   }
   iel = ++mesh->ne;
@@ -29,7 +29,7 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   pt->ref  = ref;
  
   if(mesh->ne+1 >= mesh->nemax) {
-    fprintf(stdout,"mem problem = change mmg API\n");
+    fprintf(stdout,"mem problem = change mmg API -- %d >= %d\n",mesh->ne+1,mesh->nemax);
     exit(0);
   }
   iel = ++mesh->ne;
@@ -49,7 +49,7 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   pt->ref  = ref;
 
   if(mesh->ne+1 >= mesh->nemax) {
-    fprintf(stdout,"mem problem = change mmg API\n");
+    fprintf(stdout,"mem problem = change mmg API -- %d >= %d\n",mesh->ne+1,mesh->nemax);
     exit(0);
   }
   iel = ++mesh->ne;
@@ -69,7 +69,7 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   pt->ref  = ref;
 
   if(mesh->ne+1 >= mesh->nemax) {
-    fprintf(stdout,"mem problem = change mmg API\n");
+    fprintf(stdout,"mem problem = change mmg API -- %d >= %d\n",mesh->ne+1,mesh->nemax);
     exit(0);
   }
   iel = ++mesh->ne;
@@ -89,7 +89,7 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   pt->ref  = ref;
  
   if(mesh->ne+1 >= mesh->nemax) {
-    fprintf(stdout,"mem problem = change mmg API\n");
+    fprintf(stdout,"mem problem = change mmg API -- %d >= %d\n",mesh->ne+1,mesh->nemax);
     exit(0);
   }
   iel = ++mesh->ne;
@@ -109,7 +109,7 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   pt->ref  = ref;
 
   if(mesh->ne+1 >= mesh->nemax) {
-    fprintf(stdout,"mem problem = change mmg API\n");
+    fprintf(stdout,"mem problem = change mmg API -- %d >= %d\n",mesh->ne+1,mesh->nemax);
     exit(0);
   }
   iel = ++mesh->ne;
@@ -514,7 +514,7 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
     }
     c[0] /= 8.; c[1] /= 8.; c[2] /= 8.;
     if(mesh->np+1 >= mesh->npmax) {
-      fprintf(stdout,"mem problem = change mmg API\n");
+      fprintf(stdout,"mem problem = change mmg API -- %d >= %d points -- %d new points\n",mesh->np+1,mesh->npmax,nncut);
       exit(0);
     }
     ip   = ++mesh->np;
@@ -537,8 +537,8 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
       nu2 = H2T_hidir[i][2];
       if(H2T_edgePoint(hed,ph[nu1],ph[nu2])) {
 	if(mesh->ne+1 >= mesh->nemax) {
-	       fprintf(stdout,"mem problem = change mmg API\n");
-	       exit(0);
+	  fprintf(stdout,"mem problem = change mmg API -- %d >= %d -- %d new points\n",mesh->ne+1,mesh->nemax,nncut);
+	  exit(0);
 	}
     	iel = ++mesh->ne;
 	mesh->nenil = mesh->tetra[iel].v[3];
@@ -555,8 +555,8 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
     	  pt->v[2] = ph[H2T_hidir[i][1]];
     	}
 	if(mesh->ne+1 >= mesh->nemax) {
-	       fprintf(stdout,"mem problem = change mmg API\n");
-	       exit(0);
+	  fprintf(stdout,"mem problem = change mmg API -- %d >= %d -- %d new points\n",mesh->ne+1,mesh->nemax,nncut);
+	  exit(0);
 	}
     	iel = ++mesh->ne;
 	mesh->nenil = mesh->tetra[iel].v[3];
@@ -577,8 +577,8 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
     	nu2 = H2T_hidir[i][3];
     	if(!H2T_edgePoint(hed,ph[nu1],ph[nu2])) H2T_edgePut(hed,ph[nu1],ph[nu2],2);
 	if(mesh->ne+1 >= mesh->nemax) {
-	       fprintf(stdout,"mem problem = change mmg API\n");
-	       exit(0);
+	  fprintf(stdout,"mem problem = change mmg API -- %d >= %d -- %d new points\n",mesh->ne+1,mesh->nemax,nncut);
+	  exit(0);
 	}
     	iel = ++mesh->ne;
 	mesh->nenil = mesh->tetra[iel].v[3];
@@ -595,8 +595,8 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
     	  pt->v[2] = ph[nu2];
     	}
 	if(mesh->ne+1 >= mesh->nemax) {
-	       fprintf(stdout,"mem problem = change mmg API\n");
-	       exit(0);
+	  fprintf(stdout,"mem problem = change mmg API -- %d >= %d -- %d new points\n",mesh->ne+1,mesh->nemax,nncut);
+	  exit(0);
 	}
     	iel = ++mesh->ne;
 	mesh->nenil = mesh->tetra[iel].v[3];
