@@ -9,7 +9,7 @@
 #include <float.h>
 #include <limits.h>
 
-int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,char *filename) {
+int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,int nbhex,char *filename) {
   FILE*            inm;
   char             data[128],chaine[128];
   float            fx,fy,fz;
@@ -35,7 +35,7 @@ int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,char *filename) {
     } else if(!strncmp(chaine,"Vertices",strlen("Vertices"))) {
       fscanf(inm,"%d",&np);
       fprintf(stdout,"  READING %d VERTICES\n",np);
-      if ( MMG3D_Set_meshSize(mmgMesh,np,0,0,0,0,0) != 1 )  exit(EXIT_FAILURE);
+      if ( MMG3D_Set_meshSize(mmgMesh,np,6*nbhex,0,0,0,0) != 1 )  exit(EXIT_FAILURE);
       for (k=1; k<=np; k++) {
       	fscanf(inm,"%lf %lf %lf %d",&x,&y,&z,&ref);
 	if ( MMG3D_Set_vertex(mmgMesh,x  ,y  ,z  ,ref,  k) != 1 )  exit(EXIT_FAILURE);
@@ -56,6 +56,11 @@ int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,char *filename) {
     }
   }
   fclose(inm);
+
+  mmgMesh->ne = 0;
+  mmgMesh->nenil = 0;
+  for (k=mmgMesh->nenil; k<mmgMesh->nemax-1; k++)
+    mmgMesh->tetra[k].v[3] = k+1;
   return(nhex);
 }
   
@@ -108,7 +113,7 @@ int main(int argc,char *argv[]) {
   }
   fclose(inm);
 
-  nbhex = H2T_loadMesh(mmgMesh,hexa,filename);
+  nbhex = H2T_loadMesh(mmgMesh,hexa,nbhex,filename);
 
   /*call hex2tet library*/
   H2T_libhex2tet(mmgMesh,hexa,nbhex);
