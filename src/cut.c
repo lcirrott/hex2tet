@@ -20,9 +20,12 @@ static int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref) {
   pt->v[3] = p[7];
   if(H2T_quickvol(mesh->point[p[0]].c,mesh->point[p[1]].c,
 		  mesh->point[p[3]].c,mesh->point[p[7]].c) < 0) {
+    printf("hex %d %d %d %d %d %d %d %d seems bad oriented\n",
+	   p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
     printf("ahhhh %e\n",H2T_quickvol(mesh->point[p[0]].c,mesh->point[p[1]].c,
 				     mesh->point[p[3]].c,mesh->point[p[7]].c));
-  }
+    exit(0);
+  } 
   pt->ref  = ref;
  
   if(mesh->ne+1 >= mesh->nemax) {

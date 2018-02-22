@@ -29,10 +29,11 @@ double H2T_quickvol(double *c1,double *c2,double *c3,double *c4) {
 }
 
 int H2T_chkorient(MMG5_pMesh mmgMesh,int* hexa,int nhex) {
-  int     nbado,k,i,iadr,tmp,ph[8];
+  int     nbado,k,i,iadr,ph[8];
   double  volref,volhex;
   
   nbado = 0;
+  volref = 1;
   for (k=1; k<=nhex; k++) {
     iadr = 9*k;
     for(i=0 ; i<8 ; i++)
@@ -40,23 +41,21 @@ int H2T_chkorient(MMG5_pMesh mmgMesh,int* hexa,int nhex) {
      
     //check orientability of the hexahedra : vol of tet p0 p1 p3 p4
     volhex = H2T_quickvol(mmgMesh->point[ph[0]].c,mmgMesh->point[ph[1]].c
-			  ,mmgMesh->point[ph[2]].c,mmgMesh->point[ph[3]].c);
-    if(k==1) {
-      volref = volhex;
-      //printf("vol %e\n",volref);
+			  ,mmgMesh->point[ph[3]].c,mmgMesh->point[ph[4]].c);
+    /* if(0 && k==1) { */
+    /*   volref = volhex; */
+    /*   //printf("vol %e\n",volref); */
+    /* } */
+    /* else { */
+    if(volref*volhex < 0) {
+      //fprintf(stdout,"BAD ORIENTATION OF HEXAHEDRON %d : %d %d %d %d %d %d %d %d\n",k,ph[0],ph[1],ph[2],ph[3],ph[4],ph[5],ph[6],ph[7]);
+      nbado++;
+      hexa[iadr + 3] = ph[1];
+      hexa[iadr + 1] = ph[3];
+      hexa[iadr + 5] = ph[7];
+      hexa[iadr + 7] = ph[5];
     }
-    else {
-      if(volref*volhex < 0) {
-	fprintf(stdout,"BAD ORIENTATION OF HEXAHEDRON %d : %d %d %d %d %d %d %d %d\n",k,ph[0],ph[1],ph[2],ph[3],ph[4],ph[5],ph[6],ph[7]);
-	nbado++;
-	tmp = ph[3];
-	ph[3] = ph[1];
-	ph[1] = tmp;
-	tmp = ph[5];
-	ph[5] = ph[7];
-	ph[7] = tmp;
-      }
-    }
+      /*}*/
   }
   return(nbado);
 
