@@ -8,7 +8,7 @@ PROJECT (hex2tet)
 #####
 ###############################################################################
 SET (CMAKE_RELEASE_VERSION_MAJOR "0")
-SET (CMAKE_RELEASE_VERSION_MINOMMGR "0")
+SET (CMAKE_RELEASE_VERSION_MINOR "0")
 SET (CMAKE_RELEASE_VERSION_PATCH "0")
 SET (CMAKE_RELEASE_DATE "July 2, 2015")
 
