@@ -10,10 +10,16 @@ PROJECT (hex2tet)
 SET (CMAKE_RELEASE_VERSION_MAJOR "1")
 SET (CMAKE_RELEASE_VERSION_MINOR "0")
 SET (CMAKE_RELEASE_VERSION_PATCH "0")
-SET (CMAKE_RELEASE_DATE "July 2, 2015")
+SET (CMAKE_RELEASE_DATE "July 2, 2016")
 
 SET (CMAKE_RELEASE_VERSION
   "${CMAKE_RELEASE_VERSION_MAJOR}.${CMAKE_RELEASE_VERSION_MINOR}.${CMAKE_RELEASE_VERSION_PATCH}")
+
+# Create hex2tet.h file with the good release infos.
+FILE ( MAKE_DIRECTORY  ${PROJECT_BINARY_DIR}/src )
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/src/hex2tet.h.in
+  ${PROJECT_BINARY_DIR}/src/hex2tet.h @ONLY)
+INCLUDE_DIRECTORIES ( ${PROJECT_BINARY_DIR}/src )
 
 ###############################################################################
 #####
@@ -86,31 +92,31 @@ IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   SET(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} )
 ENDIF()
 
- ############################################################################
-  #####
-  #####        MMG (for mesh data structure)
-  #####
-  ############################################################################
-  SET(MMG_DIR "" CACHE PATH "Installation directory for mmg")
-  INCLUDE(cmake/modules/FindMmg.cmake)
+############################################################################
+#####
+#####        MMG (for mesh data structure)
+#####
+############################################################################
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-  INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/mmg/)
+SET(MMG_DIR "" CACHE PATH "Installation directory for mmg")
 
+FIND_PACKAGE(Mmg)
 
-  IF(NOT MMG_DIR)
-    MESSAGE ( FATAL_ERROR "ERROR: The installation directory for mmg is required:"
-      "(see https://github.com/MmgTools/mmg and  download the branch develop)."
-      "If you have already installed Mmg and want to use it, "
-      "please set the CMake variable or environment variable MMG_DIR "
-      "to your mmg directory.")     # Set flags for building test program
-  ELSE ( )
-      INCLUDE_DIRECTORIES(${MMG_INCLUDE_DIR})
+IF ( NOT MMG_FOUND )
+  MESSAGE ( FATAL_ERROR "ERROR: The installation directory for mmg is required:"
+    "(see https://github.com/MmgTools/mmg and  download the branch develop)."
+    "If you have already installed Mmg and want to use it, "
+    "please set the CMake variable or environment variable MMG_DIR "
+    "to your mmg directory.")     # Set flags for building test program
+ELSE ( )
+  INCLUDE_DIRECTORIES(${MMG_INCLUDE_DIRS})
 
-      SET(CMAKE_REQUIRED_INCLUDES ${MMG_INCLUDE_DIR})
+  MESSAGE(STATUS
+    "Compilation with Mmg: ${MMG_LIBRARIES}")
+  SET( LIBRARIES ${MMG_LIBRARIES} ${LIBRARIES})
 
-      SET( LIBRARIES ${MMG_LIBRARY} ${LIBRARIES})
-
-  ENDIF ( )
+ENDIF ( )
 
  ############################################################################
   #####

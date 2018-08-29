@@ -9,7 +9,7 @@
  * \copyright GNU Lesser General Public License.
  */
 
-#include "libhex2tet.h"
+#include "hex2tet.h"
 
 #include <assert.h>
 #include <stdio.h>

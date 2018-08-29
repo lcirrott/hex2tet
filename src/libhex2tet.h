@@ -15,12 +15,6 @@
 extern "C" {
 #endif
 
-#define H2T_VER   "0.0.0"" c"
-#define H2T_REL   "Feb. 22, 2016"
-#define H2T_CPY   "Copyright (c) Bx INP-Inria-UBordeaux, 2016-"
-#define H2T_STR   "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-
-
 #include "mmg/mmg3d/libmmg3d.h"
 
 #define  MG_NUL       (1 << 14)

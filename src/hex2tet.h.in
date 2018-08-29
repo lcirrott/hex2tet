@@ -10,6 +10,11 @@
 
 #include "libhex2tet.h"
 
+#define H2T_VER   "@CMAKE_RELEASE_VERSION@"
+#define H2T_REL   "@CMAKE_RELEASE_DATE@"
+#define H2T_CPY   "Copyright (c) Bx INP-Inria-UBordeaux-InriaSoft, 2016-"
+#define H2T_STR   "------------------------------------------------------------"
+
 /** \brief hidir[i]: vertices of the face i */
 static const unsigned char H2T_hidir[6][4] = { {0,3,2,1},{0,4,7,3},{0,1,5,4},{4,5,6,7},{1,2,6,5},{2,3,7,6} };
 /** \brief hidiropp[i]: vertices of the face opposite to the face i */
