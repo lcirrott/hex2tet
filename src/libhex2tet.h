@@ -2,13 +2,18 @@
  * \file libhex2tet.h
  * \brief C API for hex2tet library.
  * \author C. Dobrzynski (Bx INP/Inria/UBordeaux)
- * \version 0
- * \date 02 2016
- * 
+ *
+ * \version 1
+ * \copyright GNU Lesser General Public License.
+ *
  */
 
 #ifndef _H2TLIB_H
 #define _H2TLIB_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define H2T_VER   "0.0.0"" c"
 #define H2T_REL   "Feb. 22, 2016"
@@ -17,12 +22,8 @@
 
 
 #include "mmg/mmg3d/libmmg3d.h"
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h> 
-#define  MG_NUL       (1 << 6) 
+
+#define  MG_NUL       (1 << 14)
 
 /**
  * \def H2T_SUCCESS
@@ -47,5 +48,11 @@
  *
  */
 #define H2T_STRONGFAILURE 2
+
 int H2T_libhex2tet(MMG5_pMesh ,int* ,int );
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

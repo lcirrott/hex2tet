@@ -7,7 +7,7 @@ PROJECT (hex2tet)
 #####         Release version and date
 #####
 ###############################################################################
-SET (CMAKE_RELEASE_VERSION_MAJOR "0")
+SET (CMAKE_RELEASE_VERSION_MAJOR "1")
 SET (CMAKE_RELEASE_VERSION_MINOR "0")
 SET (CMAKE_RELEASE_VERSION_PATCH "0")
 SET (CMAKE_RELEASE_DATE "July 2, 2015")
@@ -105,7 +105,7 @@ ENDIF()
       "to your mmg directory.")     # Set flags for building test program
   ELSE ( )
       INCLUDE_DIRECTORIES(${MMG_INCLUDE_DIR})
-    
+
       SET(CMAKE_REQUIRED_INCLUDES ${MMG_INCLUDE_DIR})
 
       SET( LIBRARIES ${MMG_LIBRARY} ${LIBRARIES})
@@ -142,7 +142,7 @@ ENDIF()
   ELSE ( )
     MESSAGE ( WARNING "Scotch library not found:"
       "if you compile mmg platform without scotch, it is not a problem otherwise"
-      "(see https://gforge.inria.fr/frs/?group_id=248 to download it)."
+      " see https://gforge.inria.fr/frs/?group_id=248 to download it."
       "If you have already installed Scotch and want to use it, "
       "please set the CMake variable or environment variable SCOTCH_DIR "
       "to your scotch directory.")
@@ -172,7 +172,7 @@ ENDIF()
   ELSE ( )
     MESSAGE ( WARNING "SUscElas is a library to solve the linear elasticity "
       "if you compile mmg platform without SUscElas, it is not a problem otherwise"
-      "problem (see https://github.com/SUscTools/SUscElas to download it). "
+      " see https://github.com/SUscTools/SUscElas to download it. "
       "This library is needed to use the lagrangian motion option. "
       "If you have already installed SUscElas and want to use it, "
       "please set the CMake variable or environment variable SUSCELAS_DIR "
@@ -285,7 +285,7 @@ ENDIF()
   #####
   ###############################################################################
   ADD_EXECUTABLE(${PROJECT_NAME}
- ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.h	
+ ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.h
     ${source_files} ${main_file})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LIBRARIES})
   INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
@@ -298,7 +298,3 @@ ENDIF()
   SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES RELWITHDEBINFO_POSTFIX _O)
   # in MinSizeRel mode we name the executable h2t_Os
   SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES MINSIZEREL_POSTFIX _Os)
-
-
-
-
