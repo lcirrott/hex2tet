@@ -62,17 +62,15 @@ int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,int nbhex,char *filename) {
     } else if(!strncmp(chaine,"Vertices",strlen("Vertices"))) {
       fscanf(inm,"%d",&np);
       fprintf(stdout,"  READING %d VERTICES\n",np);
-      if ( MMG3D_Set_meshSize(mmgMesh,np,6*nbhex,0,0,0,0) != 1 ) {
+      if ( H2T_Set_meshSize(mmgMesh,np,nbhex,0,0) != 1 ) {
         return -1;
       }
 
       for (k=1; k<=np; k++) {
         fscanf(inm,"%lf %lf %lf %d",&x,&y,&z,&ref);
-        if ( MMG3D_Set_vertex(mmgMesh,x  ,y  ,z  ,ref,  k) != 1 ) {
+        if ( H2T_Set_vertex(mmgMesh,x  ,y  ,z  ,ref,  k) != 1 ) {
           return -1;
         }
-
-        mmgMesh->point[k].tag = 0;//&= ~MG_NUL;
       }
       continue;
     } else if(!strncmp(chaine,"Hexahedra",strlen("Hexahedra"))) {
@@ -108,7 +106,7 @@ int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,int nbhex,char *filename) {
  *
  */
 int main(int argc,char *argv[]) {
-  FILE*            inm;
+  FILE*           inm;
   MMG5_pMesh      mmgMesh;
   MMG5_pSol       mmgSol;
   char            chaine[128],filename[128];
@@ -125,9 +123,9 @@ int main(int argc,char *argv[]) {
   mmgSol  = NULL;
   hexa    = NULL;
 
-  MMG3D_Init_mesh(MMG5_ARG_start,
-                  MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
-                  MMG5_ARG_end);
+  H2T_Init_mesh(MMG5_ARG_start,
+                MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
+                MMG5_ARG_end);
 
   /* Input data and creation of the hexa array */
   if( !(inm = fopen(filename,"r")) ) {
@@ -148,6 +146,10 @@ int main(int argc,char *argv[]) {
   fclose(inm);
 
   nbhex = H2T_loadMesh(mmgMesh,hexa,nbhex,filename);
+
+  if ( nbhex < 0 ) {
+    return H2T_STRONGFAILURE;
+  }
 
   /** call hex2tet library */
   ier = H2T_libhex2tet(mmgMesh,hexa,nbhex);

@@ -21,6 +21,42 @@
             (func),(line),(nemax),(ncut),(nhex));                       \
   } while(0)
 
+
+/**
+ * \param mesh pointer toward the tetrahedral mesh
+ * \param hed edge hash table
+ * \param v0 hexa vertex
+ * \param v1 hexa vertex
+ * \param v2 hexa vertex
+ * \param v3 hexa vertex
+ * \param ncut pointer toward the number of hexa cutted (to update)
+ * \param nhex total number of hexa
+ *
+ * \return 0 if fail, 1 if success
+ *
+ * Add a tetrahedron of vertices p[0]\@4 and print error messages if fail.
+ *
+ */
+static
+int H2T_Add_tetra(MMG5_pMesh mesh,int v0,int v1,int v2,int v3,int ref,int ncut,int nhex) {
+  int iel;
+
+  iel =  MMG3D_Add_tetrahedron ( mesh,v0,v1,v2,v3,ref);
+
+  if ( !iel ) {
+    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut,nhex);
+    return 0;
+  }
+  if ( iel < 0 ) {
+    printf("  ## Error:%s: tetra %d %d %d %d: wrong orientation\n",
+           __func__,v0,v1,v2,v3);
+    return 0;
+  }
+  //mesh->tetra[iel].mark=0;
+
+  return 1;
+}
+
 /**
  * \param mesh pointer toward the tetrahedral mesh
  * \param hed edge hash table
@@ -36,128 +72,25 @@
 static
 int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref,int *ncut,int nhex) {
   MMG5_pTetra  pt;
-  int     i,nu1,nu2,iel;
+  int     i,nu1,nu2,ier;
 
   /** Creation of the first tetra (0,1,3,7) */
-  if ( mesh->ne+1 >= mesh->nemax ) {
-    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,*ncut,nhex);
-    return 0;
-  }
-  iel = ++mesh->ne;
-  mesh->nenil = mesh->tetra[iel].v[3];
-  mesh->tetra[iel].v[3] = 0;
-  mesh->tetra[iel].mark=0;
-
-  pt = &mesh->tetra[iel];
-  pt->v[0] = p[0];
-  pt->v[1] = p[1];
-  pt->v[2] = p[3];
-  pt->v[3] = p[7];
-  if ( H2T_quickvol(mesh->point[p[0]].c,mesh->point[p[1]].c,
-                    mesh->point[p[3]].c,mesh->point[p[7]].c) < 0 ) {
-    printf("  ## Error:%s: hexa %d %d %d %d %d %d %d %d: wrong orientation\n",
-           __func__,p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
-    return 0;
-  }
-  pt->ref  = ref;
+  if ( !H2T_Add_tetra(mesh,p[0],p[1],p[3],p[7],ref,*ncut,nhex) ) return 0;
 
   /** Creation of the second tetra (7,2,6,1) */
-  if ( mesh->ne+1 >= mesh->nemax ) {
-    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,*ncut,nhex);
-    return 0;
-  }
-  iel = ++mesh->ne;
-  mesh->nenil = mesh->tetra[iel].v[3];
-  mesh->tetra[iel].v[3] = 0;
-  mesh->tetra[iel].mark=0;
-  pt = &mesh->tetra[iel];
-  pt->v[0] = p[7];
-  pt->v[1] = p[2];
-  pt->v[2] = p[6];
-  pt->v[3] = p[1];
-  if ( H2T_quickvol(mesh->point[pt->v[0]].c,mesh->point[pt->v[1]].c,
-                  mesh->point[pt->v[2]].c,mesh->point[pt->v[3]].c) < 0) {
-    return 0;
-  }
-  pt->ref  = ref;
+  if ( !H2T_Add_tetra(mesh,p[7],p[2],p[6],p[1],ref,*ncut,nhex) ) return 0;
 
-  /** Creation of the third tetra */
-  if ( mesh->ne+1 >= mesh->nemax ) {
-    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,*ncut,nhex);
-    return 0;
-  }
-  iel = ++mesh->ne;
-  mesh->nenil = mesh->tetra[iel].v[3];
-  mesh->tetra[iel].v[3] = 0;
-  mesh->tetra[iel].mark=0;
-  pt = &mesh->tetra[iel];
-  pt->v[0] = p[1];
-  pt->v[1] = p[4];
-  pt->v[2] = p[5];
-  pt->v[3] = p[7];
-  if ( H2T_quickvol(mesh->point[pt->v[0]].c,mesh->point[pt->v[1]].c,
-                  mesh->point[pt->v[2]].c,mesh->point[pt->v[3]].c) < 0 ) {
-    return 0;
-  }
-  pt->ref  = ref;
+  /** Creation of the third tetra (1,4,5,7) */
+  if ( !H2T_Add_tetra(mesh,p[1],p[4],p[5],p[7],ref,*ncut,nhex) ) return 0;
 
-  /** Creation of the third tetra */
-  if ( mesh->ne+1 >= mesh->nemax ) {
-    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,*ncut,nhex);
-    exit(EXIT_FAILURE);
-  }
-  iel = ++mesh->ne;
-  mesh->nenil = mesh->tetra[iel].v[3];
-  mesh->tetra[iel].v[3] = 0;
-  mesh->tetra[iel].mark=0;
-  pt = &mesh->tetra[iel];
-  pt->v[0] = p[7];
-  pt->v[1] = p[4];
-  pt->v[2] = p[0];
-  pt->v[3] = p[1];
-  if ( H2T_quickvol(mesh->point[pt->v[0]].c,mesh->point[pt->v[1]].c,
-                  mesh->point[pt->v[2]].c,mesh->point[pt->v[3]].c ) < 0 ) {
-    return 0;
-  }
-  pt->ref  = ref;
+  /** Creation of the fourth tetra (7,4,0,1) */
+  if ( !H2T_Add_tetra(mesh,p[7],p[4],p[0],p[1],ref,*ncut,nhex) ) return 0;
 
-  if ( mesh->ne+1 >= mesh->nemax ) {
-    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,*ncut,nhex);
-    exit(EXIT_FAILURE);
-  }
-  iel = ++mesh->ne;
-  mesh->nenil = mesh->tetra[iel].v[3];
-  mesh->tetra[iel].v[3] = 0;
-  mesh->tetra[iel].mark=0;
-  pt = &mesh->tetra[iel];
-  pt->v[0] = p[1];
-  pt->v[1] = p[6];
-  pt->v[2] = p[7];
-  pt->v[3] = p[5];
-  if ( H2T_quickvol(mesh->point[pt->v[0]].c,mesh->point[pt->v[1]].c,
-                  mesh->point[pt->v[2]].c,mesh->point[pt->v[3]].c) < 0 ) {
-    return 0;
-  }
-  pt->ref  = ref;
+  /** Creation of the fourth tetra (1,6,7,5) */
+  if ( !H2T_Add_tetra(mesh,p[1],p[6],p[7],p[5],ref,*ncut,nhex) ) return 0;
 
-  if ( mesh->ne+1 >= mesh->nemax ) {
-    H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,*ncut,nhex);
-    exit(EXIT_FAILURE);
-  }
-  iel = ++mesh->ne;
-  mesh->nenil = mesh->tetra[iel].v[3];
-  mesh->tetra[iel].v[3] = 0;
-  mesh->tetra[iel].mark=0;
-  pt = &mesh->tetra[iel];
-  pt->v[0] = p[1];
-  pt->v[1] = p[3];
-  pt->v[2] = p[7];
-  pt->v[3] = p[2];
-  if ( H2T_quickvol(mesh->point[pt->v[0]].c,mesh->point[pt->v[1]].c,
-                  mesh->point[pt->v[2]].c,mesh->point[pt->v[3]].c) < 0 ) {
-    return 0;
-  }
-  pt->ref  = ref;
+  /** Creation of the sixth tetra (1,3,7,2) */
+  if ( !H2T_Add_tetra(mesh,p[1],p[3],p[7],p[2],ref,*ncut,nhex) ) return 0;
 
   /** Add edges to the hashtable */
   H2T_edgePut(hed,p[0],p[7],2);
@@ -351,9 +284,12 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
   mark[1] = -1;
 
   for ( ih=0; ih<8; ih++ ) p[ih] = listhexa[9+ih];
-  //printf("p %d %d %d %d %d %d %d %d\n",p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
+
+  if ( mesh->info.ddebug )
+    printf(" First hexa %d %d %d %d %d %d %d %d\n",p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
+
   ncut = 0;
-  H2T_decouphex(mesh,hed,p,listhexa[9+8],&ncut,nhex);
+  if ( !H2T_decouphex(mesh,hed,p,listhexa[9+8],&ncut,nhex) ) return 0;
 
   icurc = 0;
   ipil  = 0;
@@ -380,8 +316,8 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
 
     iface = list[icurc-1]%6;
     if ( iface < 0 ) {
-      printf("%d %d %d == %d\n",iface,icurc-1,list[icurc-1],list[15620]);
-      exit(EXIT_FAILURE);
+      printf(" ## Error: %s: wrong adjacency (%d)\n",__func__,iface);
+      return 0;
     }
     ddebug=0;
 
@@ -420,7 +356,7 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
             if ( H2T_edgePoint(hed,ph[nu2],ph[nu3]) ) break;
           }
           assert(i==3);
-          //printf("iface %d on a trouve une autre arete---> renum\n",iface);
+          //printf("iface %d: another edge founded---> renum\n",iface);
           if ( iface==1 ) {
             p[0] = ph[3]; p[1] = ph[0]; p[2] = ph[1]; p[3] = ph[2];
             p[4] = ph[7]; p[5] = ph[4]; p[6] = ph[5]; p[7] = ph[6];
@@ -452,7 +388,7 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
             if ( H2T_edgePoint(hed,ph[nu1],ph[nu3]) ) break;
           }
           assert(i==3);
-          //printf("iface 4 on a trouve une autre arete---> renum\n");
+          //printf("iface 4 another edge founded ---> renum\n");
           p[0] = ph[3]; p[1] = ph[0]; p[2] = ph[1]; p[3] = ph[2];
           p[4] = ph[7]; p[5] = ph[4]; p[6] = ph[5]; p[7] = ph[6];
           H2T_decouphex(mesh,hed,p,listhexa[9*k+8],&ncut,nhex);
@@ -460,7 +396,7 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
           H2T_decouphex(mesh,hed,ph,listhexa[9*k+8],&ncut,nhex);
         }
       } else {
-        if ( ddebug)  printf("il faut renum iface %d\n",iface);//iface 0,2,3
+        if ( ddebug)  printf("face %d renumbering\n",iface);//iface 0,2,3
         icas0 = H2T_checkcase(ph,nu1,nu2,hed);
         icasopp = H2T_checkcaseopp(ph,nu1,nu2,hed);
         if ( icas0 || icasopp ) {
@@ -638,11 +574,11 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
     } else {
       /** We have no edge on iface: not normal because the adjacent
        * through iface has been cutted */
-      printf("Error: %d %d et %d %d\n",ph[H2T_hidir[iface][1]],ph[H2T_hidir[iface][3]],
+      printf("Error: %s: no created diagonal on face %d of hexa: %d %d and %d %d tested\n",
+             __func__,iface,ph[H2T_hidir[iface][1]],ph[H2T_hidir[iface][3]],
              ph[H2T_hidir[iface][0]],ph[H2T_hidir[iface][2]]);
-      printf("ph %d %d %d %d %d %d %d %d\n",ph[0],ph[1],ph[2],ph[3],ph[4],ph[5],ph[6],ph[7]);
-      printf("iface %d hidir %d %d\n",iface,H2T_hidir[iface][1],H2T_hidir[iface][3]);
-      exit(EXIT_FAILURE);
+      printf("hexa: %d %d %d %d %d %d %d %d\n",ph[0],ph[1],ph[2],ph[3],ph[4],ph[5],ph[6],ph[7]);
+      return 0;
     }
 
     /** Append the adjacents of the current tetra to the stack */
@@ -663,49 +599,32 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
         printf("k=%d: stack append: hexa %d (iface %d) in %d -- through face %d\n",
                k,adj/6,adj%6,ipil-1,i);
     }
-    // printf("---- end ipil %d icurc %d / %d\n",ipil,icurc,nhex);
   }
 
-  printf("-------- %d/%d Hexa succesfully cutted ---------------------\n",ncut,nhex);
-
   if ( ncut < nhex ) {
+    printf("     %d/%d Hexa succesfully cutted\n",ncut,nhex);
     printf("--> Try to cut the remaining hexa using point insertion\n");
   }
 
-  //stay few hexa not cutted...
+  /** Treat the remaining hexa */
   nncut = 0;
   for ( k=1; k<=nhex; k++ ) {
     if ( mark[k]==-1 ) continue;
     for(i=0;i<8;i++) ph[i] = listhexa[9*k+i];
     nncut++;
-    //create new vertex
+    /** create new vertex */
     c[0] = c[1] = c[2] = 0.;
     for ( i=0; i<8; i++ ) {
       ppt = &mesh->point[ph[i]];
       c[0] += ppt->c[0];        c[1] += ppt->c[1]; c[2] += ppt->c[2];
     }
     c[0] /= 8.; c[1] /= 8.; c[2] /= 8.;
-    if ( mesh->np+1 >= mesh->npmax ) {
-      fprintf(stdout,"%s:%d: max number of points reached (%d). %d/%d hexa treated.\n",
-              __func__,__LINE__,mesh->npmax,ncut+nncut,nhex);
-      fprintf(stdout,"%d new points.\n",nncut);
-      exit(EXIT_FAILURE);
-    }
-    ip   = ++mesh->np;
-    ppt   = &mesh->point[ip];
-    memcpy(ppt->c,c,3*sizeof(double));
-    mesh->npnil = ppt->tmp;
-    ppt->tmp    = 0;
-    ppt->ref = 0;
-    ppt->xp = 0;
-    ppt->flag = 0;
-    ppt->n[0]   = 0;
-    ppt->n[1]   = 0;
-    ppt->n[2]   = 0;
-    ppt->tag    = 0;
-    ppt->tagdel = 0;
 
-    //create 2 tets per faces
+    if ( !MMG3D_Add_vertex(mesh,c[0],c[1],c[2],0) ) return 0;
+
+    /** create 2 tets per faces */
+    int ref = listhexa[9*k+8];
+
     for ( i=0 ;i<6; i++ ) {
       nu1 = H2T_hidir[i][0];
       nu2 = H2T_hidir[i][2];
@@ -713,40 +632,23 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
         if ( mesh->ne+1 >= mesh->nemax ) {
           H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut+nncut,nhex);
           fprintf(stdout,"%d new points.\n",nncut);
-          exit(EXIT_FAILURE);
+          return 0;
         }
-        iel = ++mesh->ne;
-        mesh->nenil = mesh->tetra[iel].v[3];
-        mesh->tetra[iel].v[3] = 0;
-        mesh->tetra[iel].mark=0;
-        pt = &mesh->tetra[iel];
-        pt->v[0] = ip;
-        pt->v[1] = ph[nu1];
-        pt->v[2] = ph[nu2];
-        pt->v[3] = ph[H2T_hidir[i][1]];
-        pt->ref  = listhexa[9*k+8];
-        if ( H2T_voltet(mesh,iel)<0 ) {
-          pt->v[3] = ph[nu2];
-          pt->v[2] = ph[H2T_hidir[i][1]];
-        }
-        if ( mesh->ne+1 >= mesh->nemax ) {
+
+        /* Tetra ip,ph[nu1],ph[nu2],ph[H2T_hidir[i][1]] */
+        iel =  MMG3D_Add_tetrahedron ( mesh,ip,ph[nu1],ph[nu2],ph[H2T_hidir[i][1]],ref );
+        if ( !iel ) {
           H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut+nncut,nhex);
           fprintf(stdout,"%d new points.\n",nncut);
-          exit(EXIT_FAILURE);
+          return 0;
         }
-        iel = ++mesh->ne;
-        mesh->nenil = mesh->tetra[iel].v[3];
-        mesh->tetra[iel].v[3] = 0;
-        mesh->tetra[iel].mark=0;
-        pt = &mesh->tetra[iel];
-        pt->v[0] = ip;
-        pt->v[1] = ph[nu1];
-        pt->v[2] = ph[H2T_hidir[i][3]];
-        pt->v[3] = ph[nu2];
-        pt->ref  = listhexa[9*k+8];;
-        if ( H2T_voltet(mesh,iel)<0 ) {
-          pt->v[3] = ph[H2T_hidir[i][3]];
-          pt->v[2] = ph[nu2];
+
+        /* Tetra ip,ph[nu1],ph[H2T_hidir[i][3]],ph[nu2] */
+        iel =  MMG3D_Add_tetrahedron ( mesh,ip,ph[nu1],ph[H2T_hidir[i][3]],ph[nu2],ref );
+        if ( !iel ) {
+          H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut+nncut,nhex);
+          fprintf(stdout,"%d new points.\n",nncut);
+          return 0;
         }
       } else {
         nu1 = H2T_hidir[i][1];
@@ -755,41 +657,23 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
         if ( mesh->ne+1 >= mesh->nemax ) {
           H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut+nncut,nhex);
           fprintf(stdout,"%d new points.\n",nncut);
-          exit(EXIT_FAILURE);
+          return 0;
         }
-        iel = ++mesh->ne;
-        mesh->nenil = mesh->tetra[iel].v[3];
-        mesh->tetra[iel].v[3] = 0;
-        mesh->tetra[iel].mark=0;
-        pt = &mesh->tetra[iel];
-        pt->v[0] = ip;
-        pt->v[1] = ph[nu1];
-        pt->v[2] = ph[H2T_hidir[i][0]];
-        pt->v[3] = ph[nu2];
-        pt->ref  = listhexa[9*k+8];;
-        if ( H2T_voltet(mesh,iel)<0 ) {
-          pt->v[3] = ph[H2T_hidir[i][0]];
-          pt->v[2] = ph[nu2];
-        }
-        if ( mesh->ne+1 >= mesh->nemax ) {
+
+        /* Tetra ip,ph[nu1],ph[H2T_hidir[i][0]],ph[nu2] */
+        iel =  MMG3D_Add_tetrahedron ( mesh,ip,ph[nu1],ph[H2T_hidir[i][0]],ph[nu2],ref );
+        if ( !iel ) {
           H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut+nncut,nhex);
           fprintf(stdout,"%d new points.\n",nncut);
-          exit(EXIT_FAILURE);
+          return 0;
         }
-        iel = ++mesh->ne;
-        mesh->nenil = mesh->tetra[iel].v[3];
-        mesh->tetra[iel].v[3] = 0;
-        mesh->tetra[iel].mark=0;
-        pt = &mesh->tetra[iel];
-        pt->v[0] = ip;
-        pt->v[1] = ph[nu1];
-        pt->v[2] = ph[nu2];
-        pt->v[3] = ph[H2T_hidir[i][2]];
-        pt->ref  = listhexa[9*k+8];
 
-        if ( H2T_voltet(mesh,iel)<0 ) {
-          pt->v[2] = ph[H2T_hidir[i][2]];
-          pt->v[3] = ph[nu2];
+        /* Tetra ip,ph[nu1],ph[nu2],ph[H2T_hidir[i][2]] */
+        iel =  MMG3D_Add_tetrahedron ( mesh,ip,ph[nu1],ph[nu2],ph[H2T_hidir[i][2]],ref );
+        if ( !iel ) {
+          H2T_MAXTET_ERROR_MESSAGE(__func__,__LINE__,mesh->nemax,ncut+nncut,nhex);
+          fprintf(stdout,"%d new points.\n",nncut);
+          return 0;
         }
       }
     }
