@@ -526,7 +526,7 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
         }
       }
       else {
-        if ( ddebug)  printf("il faut renum iface %d\n",iface);//iface 1,4,5
+        if ( ddebug)  printf("face %d renumbering\n",iface);//iface 1,4,5
         icas0 = H2T_checkcase(ph,nu1,nu2,hed);
         icasopp = H2T_checkcaseopp(ph,nu1,nu2,hed);
         if ( icas0 || icasopp ) {
@@ -549,7 +549,11 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
           }
           break;
         case(4):
-          if ( ddebug) printf("at the beginning %d : %d %d %d %d %d %d %d %d\n",k,ph[0],ph[1],ph[2],ph[3],ph[4],ph[5],ph[6],ph[7]);
+          if ( ddebug ) {
+            printf("at the beginning %d : %d %d %d %d %d %d %d %d\n",
+                   k,ph[0],ph[1],ph[2],ph[3],ph[4],ph[5],ph[6],ph[7]);
+          }
+
           if ( icas0 ) {
             p[0] = ph[1]; p[1] = ph[2]; p[2] = ph[3]; p[3] = ph[0];
             p[4] = ph[5]; p[5] = ph[6]; p[6] = ph[7]; p[7] = ph[4];
@@ -557,7 +561,10 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
             p[0] = ph[2]; p[1] = ph[3]; p[2] = ph[0]; p[3] = ph[1];
             p[4] = ph[6]; p[5] = ph[7]; p[6] = ph[4]; p[7] = ph[5];
           }
-          if ( ddebug)  printf("at the end %d : %d %d %d %d %d %d %d %d\n",k,p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
+          if ( ddebug ) {
+            printf("at the end %d : %d %d %d %d %d %d %d %d\n",
+                   k,p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
+          }
           break;
         case(5):
           if ( icas0 ) {
