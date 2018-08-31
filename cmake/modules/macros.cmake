@@ -165,19 +165,14 @@ ENDMACRO ( )
 ###############################################################################
 
 MACRO ( ADD_TARGET_POSTFIX target_name )
-  IF ( CMAKE_BUILD_TYPE MATCHES "Debug" )
-    # in debug mode we name the executable mmgs_debug
-    SET_TARGET_PROPERTIES(${target_name} PROPERTIES DEBUG_POSTFIX _debug)
-  ELSEIF ( CMAKE_BUILD_TYPE MATCHES "Release" )
-    # in Release mode we name the executable mmgs_O3
-    SET_TARGET_PROPERTIES(${target_name} PROPERTIES RELEASE_POSTFIX _O3)
-  ELSEIF ( CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" )
-    # in RelWithDebInfo mode we name the executable mmgs_O3d
-    SET_TARGET_PROPERTIES(${target_name} PROPERTIES RELWITHDEBINFO_POSTFIX _O3d)
-  ELSEIF ( CMAKE_BUILD_TYPE MATCHES "MinSizeRel" )
-    # in MinSizeRel mode we name the executable mmgs_O3
-    SET_TARGET_PROPERTIES(${target_name} PROPERTIES MINSIZEREL_POSTFIX _Os)
-  ENDIF ( )
+  # in debug mode we name the executable mmgs_debug
+  SET_TARGET_PROPERTIES(${target_name} PROPERTIES DEBUG_POSTFIX _debug)
+  # in Release mode we name the executable mmgs_O3
+  SET_TARGET_PROPERTIES(${target_name} PROPERTIES RELEASE_POSTFIX _O3)
+  # in RelWithDebInfo mode we name the executable mmgs_O3d
+  SET_TARGET_PROPERTIES(${target_name} PROPERTIES RELWITHDEBINFO_POSTFIX _O3d)
+  # in MinSizeRel mode we name the executable mmgs_O3
+  SET_TARGET_PROPERTIES(${target_name} PROPERTIES MINSIZEREL_POSTFIX _Os)
 ENDMACRO ( )
 
 ###############################################################################

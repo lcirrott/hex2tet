@@ -58,7 +58,7 @@ int H2T_hashHexa(int* listhexa,int* adjahex,int nhex) {
   unsigned int     key;
 
   /* default */
-  fprintf(stdout,"  ** SETTING HEXA ADJACENCIES\n");
+  fprintf(stdout,"  ** SETTING HEXA ADJACENCIES\n\n");
   fflush(stdout);
 
   /* memory alloc */

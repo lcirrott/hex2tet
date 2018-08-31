@@ -95,6 +95,178 @@ int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,int nbhex,char *filename) {
 }
 
 /**
+ * \param *prog pointer toward the program name.
+ *
+ * Print help for hex2tet application
+ *
+ */
+static
+int H2T_usage(char *prog) {
+
+  fprintf(stdout,"\nUsage: %s [-v [n]] [opts..] filein [fileout]\n",prog);
+
+  fprintf(stdout,"\n** Generic options :\n");
+  fprintf(stdout,"-h        Print this message\n");
+  fprintf(stdout,"-v [n]    Tune level of verbosity, [-10..10]\n");
+  fprintf(stdout,"-m [n]    Set maximal memory size to n Mbytes\n");
+  fprintf(stdout,"-d        Turn on debug mode\n");
+
+  fprintf(stdout,"\n**  File specifications\n");
+  fprintf(stdout,"-in  file  input triangulation\n");
+  fprintf(stdout,"-out file  output triangulation\n");
+
+  return 1;
+}
+
+/**
+ * \param argc number of command line arguments.
+ * \param argv command line arguments.
+ * \param mesh pointer toward the mesh structure.
+ * \param met pointer toward the sol structure.
+ * \return 1 if we want to run Mmg after, 0 if not or if fail.
+ *
+ * Store command line arguments.
+ *
+ */
+static
+int H2T_parsar(int argc,char *argv[],MMG5_pMesh mesh,MMG5_pSol met) {
+  int     i;
+  char    namein[128];
+
+  /* read arguments. */
+  i = 1;
+  while ( i < argc ) {
+    if ( *argv[i] == '-' ) {
+      switch(argv[i][1]) {
+      case '?':
+        H2T_usage(argv[0]);
+        return 0;
+      case 'd':
+        /* debug */
+        if ( !MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_debug,1) ) {
+          return 0;
+        }
+        break;
+      case 'h':
+        H2T_usage(argv[0]);
+        return 0;
+        break;
+      case 'i':
+        if ( !strcmp(argv[i],"-in") ) {
+          if ( ++i < argc && isascii(argv[i][0]) && argv[i][0]!='-') {
+            if ( !MMG3D_Set_inputMeshName(mesh, argv[i]) )
+              return 0;
+
+          }else{
+            fprintf(stderr,"Missing filname for %c%c\n",argv[i-1][1],argv[i-1][2]);
+            H2T_usage(argv[0]);
+            return 0;
+          }
+        }
+        break;
+      case 'm':  /* memory */
+        if ( ++i < argc && isdigit(argv[i][0]) ) {
+          if ( !MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_mem,atoi(argv[i])) )
+            return 0;
+        }
+        else {
+          fprintf(stderr,"Missing argument option %c\n",argv[i-1][1]);
+          H2T_usage(argv[0]);
+          return 0;
+        }
+        break;
+      case 'o':
+        if ( ++i < argc && isascii(argv[i][0])  && argv[i][0]!='-') {
+          if ( !MMG3D_Set_outputMeshName(mesh,argv[i]) )
+            return 0;
+        }else{
+          fprintf(stderr,"Missing filname for %c%c%c\n",
+                  argv[i-1][1],argv[i-1][2],argv[i-1][3]);
+          H2T_usage(argv[0]);
+          return 0;
+        }
+        break;
+      case 'v':
+        if ( ++i < argc ) {
+          if ( isdigit(argv[i][0]) ||
+               (argv[i][0]=='-' && isdigit(argv[i][1])) ) {
+            if ( !MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_verbose,atoi(argv[i])) )
+              return 0;
+          }
+          else {
+            i--;
+            fprintf(stderr,"Missing argument option %s\n",argv[i]);
+          }
+        }
+        else {
+          fprintf(stderr,"Missing argument option %s\n",argv[i-1]);
+          H2T_usage(argv[0]);
+          return 0;
+        }
+        break;
+      default:
+        fprintf(stderr,"Unrecognized option %s\n",argv[i]);
+        H2T_usage(argv[0]);
+        return 0;
+      }
+    }
+    else {
+      if ( mesh->namein == NULL ) {
+        if ( !MMG3D_Set_inputMeshName(mesh,argv[i]) )
+          return 0;
+        if ( mesh->info.imprim == -99 ) {
+          if ( !MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_verbose,5) )
+            return 0;
+        }
+      }
+      else if ( mesh->nameout == NULL ) {
+        if ( !MMG3D_Set_outputMeshName(mesh,argv[i]) )
+          return 0;
+      }
+      else {
+        fprintf(stdout,"Argument %s ignored\n",argv[i]);
+        H2T_usage(argv[0]);
+        return 0;
+      }
+    }
+    i++;
+  }
+
+  /* check file names */
+  if ( mesh->info.imprim == -99 ) {
+    fprintf(stdout,"\n  -- PRINT (0 10(advised) -10) ?\n");
+    fflush(stdin);
+    fscanf(stdin,"%d",&i);
+    if ( !MMG3D_Set_iparameter(mesh,met,MMG3D_IPARAM_verbose,i) )
+      return 0;
+  }
+
+  if ( mesh->namein == NULL ) {
+    fprintf(stdout,"  -- INPUT MESH NAME ?\n");
+    fflush(stdin);
+    fscanf(stdin,"%127s",namein);
+    if ( !MMG3D_Set_inputMeshName(mesh,namein) )
+      return 0;
+  }
+
+  if ( mesh->nameout == NULL ) {
+    if ( !MMG3D_Set_outputMeshName(mesh,"") )
+      return 0;
+  }
+
+  if ( met->namein == NULL ) {
+    if ( !MMG3D_Set_inputSolName(mesh,met,"") )
+      return 0;
+  }
+  if ( met->nameout == NULL ) {
+    if ( !MMG3D_Set_outputSolName(mesh,met,"") )
+      return 0;
+  }
+
+  return 1;
+}
+
+/**
  * \param argc number of command line arguments.
  * \param argv command line arguments.
  * \return \ref H2T_SUCCESS if success.
@@ -108,27 +280,34 @@ int main(int argc,char *argv[]) {
   FILE*           inm;
   MMG5_pMesh      mmgMesh;
   MMG5_pSol       mmgSol;
-  char            chaine[128],filename[128];
+  char            chaine[128];
   int             *hexa,nbhex,ier;
 
   fprintf(stdout,"\n  -- H2T, Release %s (%s) \n",H2T_VER,H2T_REL);
   fprintf(stdout,"     %s\n",H2T_CPY);
   fprintf(stdout,"     %s %s\n\n",__DATE__,__TIME__);
-  fprintf(stdout,"FILENAME ?\n");
-  fscanf(stdin,"%s",filename);
 
   /** Mesh initialization */
   mmgMesh = NULL;
   mmgSol  = NULL;
   hexa    = NULL;
 
-  H2T_Init_mesh(MMG5_ARG_start,
-                MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
-                MMG5_ARG_end);
+  MMG3D_Init_mesh(MMG5_ARG_start,
+                  MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
+                  MMG5_ARG_end);
+
+  /* reset default values for file names */
+  if ( !MMG3D_Free_names(MMG5_ARG_start,
+                         MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
+                         MMG5_ARG_end) )
+    return H2T_STRONGFAILURE;
+
+  /* command line */
+  if ( !H2T_parsar(argc,argv,mmgMesh,mmgSol) )  return H2T_STRONGFAILURE;
 
   /* Input data and creation of the hexa array */
-  if( !(inm = fopen(filename,"r")) ) {
-    fprintf(stderr,"  ** %s  NOT FOUND.\n",filename);
+  if( !(inm = fopen(mmgMesh->namein,"r")) ) {
+    fprintf(stderr,"  ** %s  NOT FOUND.\n",mmgMesh->namein);
     return 0;
   }
 
@@ -145,7 +324,7 @@ int main(int argc,char *argv[]) {
   }
   fclose(inm);
 
-  nbhex = H2T_loadMesh(mmgMesh,hexa,nbhex,filename);
+  nbhex = H2T_loadMesh(mmgMesh,hexa,nbhex,mmgMesh->namein);
 
   if ( nbhex < 0 ) {
     return H2T_STRONGFAILURE;
@@ -154,7 +333,7 @@ int main(int argc,char *argv[]) {
   /** call hex2tet library */
   ier = H2T_libhex2tet(mmgMesh,hexa,nbhex);
 
-  MMG3D_saveMesh(mmgMesh,"h2t.mesh");
+  MMG3D_saveMesh(mmgMesh,mmgMesh->nameout);
 
   /** free structures */
   free(hexa);

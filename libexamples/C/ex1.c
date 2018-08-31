@@ -118,6 +118,31 @@ int main ( int argc, char* argv[] ) {
     }
   }
 
+
+  /* Save he hexa mesh */
+  /* FILE* inm = fopen("hexa.mesh","w"); */
+
+  /* fprintf(inm,"MeshVersionFormatted 2\n"); */
+  /* fprintf(inm,"\n\nDimension 3\n"); */
+  /* fprintf(inm,"\n\nVertices\n"); */
+
+  /* fprintf(inm,"%d\n",mmgMesh->np); */
+
+  /* for (int k=1; k<=mmgMesh->np; k++) { */
+  /*   MMG5_pPoint ppt = &mmgMesh->point[k]; */
+  /*   fprintf(inm,"%.15lg %.15lg %.15lg %d\n",ppt->c[0],ppt->c[1],ppt->c[2],abs(ppt->ref)); */
+  /* } */
+
+  /* fprintf(inm,"\n\nHexahedra %d\n",nbHex); */
+  /* for (int k=1; k<=nbHex; k++) { */
+  /*   fprintf(inm,"%d %d %d %d %d %d %d %d %d\n",hexTab[9*k],hexTab[9*k+1],hexTab[9*k+2], */
+  /*           hexTab[9*k+3],hexTab[9*k+4],hexTab[9*k+5],hexTab[9*k+6],hexTab[9*k+7],hexTab[9*k+8] ); */
+  /* } */
+
+  /* fprintf(inm,"\n\nEnd\n"); */
+
+  /* fclose(inm); */
+
   /** Step 5: converts hexa into a MMG5 tetrahedral mesh */
   ier = H2T_libhex2tet(mmgMesh,hexTab,nbHex);
 

@@ -7,6 +7,16 @@ IF ( BUILD_TESTING )
   SET ( CTEST_OUTPUT_DIR ${PROJECT_BINARY_DIR}/TEST_OUTPUTS )
   FILE ( MAKE_DIRECTORY  ${CTEST_OUTPUT_DIR} )
 
+
+  ADD_TEST ( NAME hex2tet_exec_test COMMAND $<TARGET_FILE:hex2tet>
+    ${CI_DIR}/hexa.mesh ${CTEST_OUTPUT_DIR}/hexa.o.mesh )
+
+  ###############################################################################
+  #####
+  #####        Tests that needs the PARMMG LIBRARY
+  #####
+  ###############################################################################
+
   IF ( LIBHEX2TET_STATIC )
     SET ( lib_name lib${PROJECT_NAME}_a )
   ELSEIF ( LIBHEX2TET_SHARED )
@@ -24,8 +34,6 @@ IF ( BUILD_TESTING )
 
     IF ( CMAKE_Fortran_COMPILER )
       ENABLE_LANGUAGE ( Fortran )
-
-      MESSAGE ( ${lib_name} )
 
       LIST ( APPEND H2T_LIB_TESTS            libhex2tet_Fortran_example )
       LIST ( APPEND H2T_LIB_TESTS_MAIN_PATH  ${LIB_DIR}/Fortran/ex1.F90 )
