@@ -18,9 +18,7 @@
 
 int H2T_Init_mesh(const int starter,...) {
   va_list        argptr;
-  MMG5_pMesh     *mesh;
-  MMG5_pSol      *sol,*disp;
-  int            typArg,meshCount,solCount,metCount,dispCount,ier;
+  int            ier;
 
   va_start(argptr, starter);
 
@@ -96,6 +94,7 @@ int _H2T_Init_mesh_var(va_list argptr) {
     return 0;
   }
 
+  ier = 0;
   if ( metCount ) {
     assert ( !solCount );
     if ( dispCount ) {

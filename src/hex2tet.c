@@ -39,7 +39,6 @@
 int H2T_loadMesh(MMG5_pMesh mmgMesh,int* tabhex,int nbhex,char *filename) {
   FILE*            inm;
   char             data[128],chaine[128];
-  float            fx,fy,fz;
   double           x,y,z;
   int              dim,np,nhex,ref,k,iadr;
 
@@ -133,6 +132,7 @@ int main(int argc,char *argv[]) {
     return 0;
   }
 
+  nbhex = 0;
   strcpy(chaine,"D");
   while(fscanf(inm,"%s",&chaine[0])!=EOF && strncmp(chaine,"End",strlen("End")) ) {
     if(!strncmp(chaine,"Hexahedra",strlen("Hexahedra"))) {

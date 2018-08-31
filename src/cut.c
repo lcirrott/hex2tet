@@ -71,8 +71,6 @@ int H2T_Add_tetra(MMG5_pMesh mesh,int v0,int v1,int v2,int v3,int ref,int ncut,i
  */
 static
 int H2T_decouphex(MMG5_pMesh mesh, pHedge hed,int* p,int ref,int *ncut,int nhex) {
-  MMG5_pTetra  pt;
-  int     i,nu1,nu2,ier;
 
   /** Creation of the first tetra (0,1,3,7) */
   if ( !H2T_Add_tetra(mesh,p[0],p[1],p[3],p[7],ref,*ncut,nhex) ) return 0;
@@ -261,12 +259,11 @@ int H2T_chkAdja(MMG5_pMesh mesh,int* listhexa,int* adjahex,int nhex) {
  *
  */
 int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
-  MMG5_pTetra    pt;
   MMG5_pPoint    ppt;
   int            i,ih,k,nu1,nu2,nu3,nu4,adj,icas0,icasopp,nncut;
-  int            *list,*mark,p[8],mini,minnumber,ipil,icurc,iface,iadr;
+  int            *list,*mark,p[8],ipil,icurc,iface,iadr;
   int            iel,ip,ph[8];
-  double         volhex,c[3];
+  double         c[3];
   int            ddebug,ncut;
 
   if ( mesh->info.ddebug ) {
@@ -627,7 +624,8 @@ int H2T_cuthex(MMG5_pMesh mesh,pHedge hed,int* listhexa,int* adjahex,int nhex) {
     }
     c[0] /= 8.; c[1] /= 8.; c[2] /= 8.;
 
-    if ( !MMG3D_Add_vertex(mesh,c[0],c[1],c[2],0) ) return 0;
+    ip = MMG3D_Add_vertex(mesh,c[0],c[1],c[2],0);
+    if ( !ip ) return 0;
 
     /** create 2 tets per faces */
     int ref = listhexa[9*k+8];
