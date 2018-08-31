@@ -9,12 +9,13 @@
  */
 
 
-#include "libhex2tet.h"
+#include "hex2tet/libhex2tet.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <memory.h>
+#include <string.h>
 
 
 int main ( int argc, char* argv[] ) {

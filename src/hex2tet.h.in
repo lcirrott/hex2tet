@@ -15,6 +15,53 @@
 #define H2T_CPY   "Copyright (c) Bx INP-Inria-UBordeaux-InriaSoft, 2016-"
 #define H2T_STR   "------------------------------------------------------------"
 
+/* Macro for fortran function generation */
+/**
+ * \def FORTRAN_NAME(nu,nl,pl,pc)
+ * \brief Adds function definitions.
+ * \param nu function name in upper case.
+ * \param nl function name in lower case.
+ * \param pl type of arguments.
+ * \param pc name of arguments.
+ * \note Macro coming from Scotch library.
+ *
+ * Adds function definitions with upcase, underscore and double
+ * underscore to match any fortran compiler.
+ *
+ */
+#define FORTRAN_NAME(nu,nl,pl,pc)               \
+  void nu pl;                                   \
+  void nl pl                                    \
+  { nu pc; }                                    \
+  void nl##_ pl                                 \
+  { nu pc; }                                    \
+  void nl##__ pl                                \
+  { nu pc; }                                    \
+  void nu pl
+
+/**
+ * \def FORTRAN_VARIADIC(nu,nl,pl,body)
+ * \brief Adds function definitions.
+ * \param nu function name in upper case.
+ * \param nl function name in lower case.
+ * \param pl type of arguments.
+ * \param body body of the function.
+ *
+ * Adds function definitions with upcase, underscore and double
+ * underscore to match any fortran compiler.
+ *
+ */
+#define FORTRAN_VARIADIC(nu,nl,pl,body)           \
+  void nu pl                                      \
+  { body }                                        \
+  void nl pl                                      \
+  { body }                                        \
+  void nl##_ pl                                   \
+  { body }                                        \
+  void nl##__ pl                                  \
+  { body }                                        \
+
+
 /** \brief hidir[i]: vertices of the face i */
 static const unsigned char H2T_hidir[6][4] = { {0,3,2,1},{0,4,7,3},{0,1,5,4},{4,5,6,7},{1,2,6,5},{2,3,7,6} };
 /** \brief hidiropp[i]: vertices of the face opposite to the face i */
@@ -52,3 +99,5 @@ int    H2T_edgePut(pHedge ,int ,int ,int );
 int    H2T_edgePoint(pHedge ,int ,int );
 
 int    H2T_cuthex(MMG5_pMesh ,pHedge ,int* ,int* ,int ) ;
+
+int    _H2T_Init_mesh_var(va_list argptr);

@@ -2,6 +2,22 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.0)
 
 PROJECT (hex2tet)
 
+INCLUDE(CMakeDependentOption)
+INCLUDE(cmake/modules/macros.cmake)
+
+# Executable path
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+SET(LIBRARY_OUTPUT_PATH    ${PROJECT_BINARY_DIR}/lib)
+
+
+SET(H2T_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+SET(H2T_BUILD_DIR  ${PROJECT_BINARY_DIR}/src)
+SET(H2T_INCLUDE    ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME} )
+
+
+FILE ( MAKE_DIRECTORY  ${H2T_BUILD_DIR} )
+
+
 ###############################################################################
 #####
 #####         Release version and date
@@ -16,10 +32,9 @@ SET (CMAKE_RELEASE_VERSION
   "${CMAKE_RELEASE_VERSION_MAJOR}.${CMAKE_RELEASE_VERSION_MINOR}.${CMAKE_RELEASE_VERSION_PATCH}")
 
 # Create hex2tet.h file with the good release infos.
-FILE ( MAKE_DIRECTORY  ${PROJECT_BINARY_DIR}/src )
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/src/hex2tet.h.in
-  ${PROJECT_BINARY_DIR}/src/hex2tet.h @ONLY)
-INCLUDE_DIRECTORIES ( ${PROJECT_BINARY_DIR}/src )
+  ${H2T_BUILD_DIR}/hex2tet.h @ONLY)
+INCLUDE_DIRECTORIES ( ${H2T_BUILD_DIR} )
 
 ###############################################################################
 #####
@@ -29,10 +44,6 @@ INCLUDE_DIRECTORIES ( ${PROJECT_BINARY_DIR}/src )
 
 # To see flags and options of compilation
 #SET(CMAKE_VERBOSE_MAKEFILE TRUE)
-
-# Executable path
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-SET(H2T_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
 # Find "exotic" compilers
 IF (${CMAKE_C_COMPILER} MATCHES Clang OR ${CMAKE_C_COMPILER} MATCHES clang)
@@ -94,6 +105,19 @@ ENDIF()
 
 ############################################################################
 #####
+#####         Fortran header: libmmgtypesf.h
+#####
+############################################################################
+ADD_EXECUTABLE(genheader ${PROJECT_SOURCE_DIR}/scripts/genheader.c)
+TARGET_LINK_LIBRARIES ( genheader ${LIBRARIES}  )
+GENERATE_FORTRAN_HEADER ( hex2tet
+  ${H2T_SOURCE_DIR} libhex2tet.h
+  ${H2T_BUILD_DIR}
+  ${H2T_BUILD_DIR} libhex2tetf.h
+  )
+
+############################################################################
+#####
 #####        MMG (for mesh data structure)
 #####
 ############################################################################
@@ -118,73 +142,60 @@ ELSE ( )
 
 ENDIF ( )
 
- ############################################################################
-  #####
-  #####         Scotch
-  #####
-  ############################################################################
-  # add SCOTCH library?
-  SET(SCOTCH_DIR "" CACHE PATH "Installation directory for scotch")
-  INCLUDE(cmake/modules/FindScotch.cmake)
+############################################################################
+#####
+#####         Scotch
+#####
+############################################################################
+# add SCOTCH library?
+SET(SCOTCH_DIR "" CACHE PATH "Installation directory for scotch")
 
-  IF(SCOTCH_FOUND)
-    OPTION ( USE_SCOTCH "Use SCOTCH TOOL for renumbering" ON)
-    IF( USE_SCOTCH )
-      # Set flags for building test program
-      INCLUDE_DIRECTORIES(${SCOTCH_INCLUDE_DIR})
+FIND_PACKAGE(Scotch)
 
-      SET(CMAKE_REQUIRED_INCLUDES ${SCOTCH_INCLUDE_DIR})
-      SET(CMAKE_REQUIRED_LIBRARIES ${SCOTCH_LIBRARY})
-      SET(CMAKE_REQUIRED_LIBRARIES ${SCOTCHERR_LIBRARY})
+IF ( NOT SCOTCH_FOUND )
+  MESSAGE ( WARNING "Scotch library not found:"
+    "Using scotch reduce the execution time of mmg3d "
+    "(see https://gforge.inria.fr/frs/?group_id=248 to download it)."
+    "If you have already installed Scotch and want to use it, "
+    "please set the CMake variable or environment variable SCOTCH_DIR "
+    "to your scotch directory.")
+ENDIF ( )
 
-      SET(CMAKE_C_FLAGS "-DUSE_SCOTCH ${CMAKE_C_FLAGS}")
-      SET(SCOTCH_LINK_FLAGS "-lpthread")
-      MESSAGE(STATUS
-        "Compilation with scotch: ${SCOTCH_LIBRARY}")
-      SET( LIBRARIES ${SCOTCH_LINK_FLAGS} ${LIBRARIES})
-      SET( LIBRARIES ${SCOTCHERR_LIBRARY} ${LIBRARIES})
-      SET( LIBRARIES ${SCOTCH_LIBRARY} ${LIBRARIES})
-    ENDIF()
-  ELSE ( )
-    MESSAGE ( WARNING "Scotch library not found:"
-      "if you compile mmg platform without scotch, it is not a problem otherwise"
-      " see https://gforge.inria.fr/frs/?group_id=248 to download it."
-      "If you have already installed Scotch and want to use it, "
-      "please set the CMake variable or environment variable SCOTCH_DIR "
-      "to your scotch directory.")
-  ENDIF ( )
+############################################################################
+#####
+#####         Elastic
+#####
+############################################################################
+# add SUscElas library?
+SET(ELAS_DIR "" CACHE PATH "Installation directory for Elas")
+INCLUDE(cmake/modules/FindElas.cmake)
 
-  ############################################################################
-  #####
-  #####         Elastic
-  #####
-  ############################################################################
-  # add SUscElas library?
-  SET(SUSCELAS_DIR "" CACHE PATH "Installation directory for SUscElas")
-  INCLUDE(cmake/modules/FindSUscElas.cmake)
+CMAKE_DEPENDENT_OPTION (
+  USE_ELAS "Use the Elas library for lagrangian motion option" ON
+  "ELAS_FOUND" OFF)
 
-  IF(SUSCELAS_FOUND)
-      # Set flags for building test program
-      INCLUDE_DIRECTORIES(${SUSCELAS_INCLUDE_DIR})
+IF( USE_ELAS )
+  # Set flags for building test program
+  INCLUDE_DIRECTORIES(${ELAS_INCLUDE_DIR})
 
-      SET(CMAKE_REQUIRED_INCLUDES ${SUSCELAS_INCLUDE_DIR})
-      SET(CMAKE_REQUIRED_LIBRARIES ${SUSCELAS_LIBRARY})
+  SET(CMAKE_REQUIRED_INCLUDES ${ELAS_INCLUDE_DIR})
+  SET(CMAKE_REQUIRED_LIBRARIES ${ELAS_LIBRARY})
 
-      SET(CMAKE_C_FLAGS "-DUSE_SUSCELAS ${CMAKE_C_FLAGS}")
-      MESSAGE(STATUS
-        "Compilation with the Elas library: ${SUSCELAS_LIBRARY} ")
-      SET( LIBRARIES ${SUSCELAS_LINK_FLAGS} ${LIBRARIES})
-      SET( LIBRARIES ${SUSCELAS_LIBRARY} ${LIBRARIES})
-  ELSE ( )
-    MESSAGE ( WARNING "SUscElas is a library to solve the linear elasticity "
-      "if you compile mmg platform without SUscElas, it is not a problem otherwise"
-      " see https://github.com/SUscTools/SUscElas to download it. "
-      "This library is needed to use the lagrangian motion option. "
-      "If you have already installed SUscElas and want to use it, "
-      "please set the CMake variable or environment variable SUSCELAS_DIR "
-      "to your SUscElas directory.")
-  ENDIF ( )
+  SET(CMAKE_C_FLAGS "-DUSE_ELAS ${CMAKE_C_FLAGS}")
+  MESSAGE(STATUS
+    "Compilation with the Elas library: ${ELAS_LIBRARY} ")
+  SET( LIBRARIES ${ELAS_LINK_FLAGS} ${LIBRARIES})
+  SET( LIBRARIES ${ELAS_LIBRARY} ${LIBRARIES})
+ENDIF()
 
+IF (ELAS_NOTFOUND)
+  MESSAGE ( WARNING "Elas is a library to solve the linear elasticity "
+    "problem (see https://github.com/SUscTools/Elas to download it). "
+    "This library is needed to use the lagrangian motion option. "
+    "If you have already installed Elas and want to use it, "
+    "please set the CMake variable or environment variable ELAS_DIR "
+    "to your Elas directory.")
+ENDIF ( )
 
 ###############################################################################
 #####
@@ -196,111 +207,112 @@ INCLUDE_DIRECTORIES(${H2T_SOURCE_DIR})
 # Source files
 FILE(
   GLOB
-  source_files
+  library_files
   ${H2T_SOURCE_DIR}/*.c   ${H2T_SOURCE_DIR}/*.h
   )
-LIST(REMOVE_ITEM source_files
-  ${H2T_SOURCE_DIR}/hex2tet.c
-  ${REMOVE_FILE})
+LIST(REMOVE_ITEM library_files
+  ${H2T_SOURCE_DIR}/hex2tet.c)
+
 FILE(
   GLOB
   main_file
   ${H2T_SOURCE_DIR}/hex2tet.c
-  ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.c
-  ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}f.c
-   )
-FILE(
-  GLOB
-  lib_file
-  ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.c
-  ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}f.c
   )
 IF (NOT WIN32)
   FIND_LIBRARY(M_LIB m)
   SET( LIBRARIES ${M_LIB} ${LIBRARIES})
 ENDIF()
 
- ############################################################################
-  #####
-  #####Set the full RPATH to find libraries independently from LD_LIBRARY_PATH
-  #####
-  ############################################################################
-  SET(CMAKE_MACOSX_RPATH TRUE)
+############################################################################
+#####
+##### RPATH for MACOSX
+#####
+############################################################################
+SET(CMAKE_MACOSX_RPATH 1)
 
-  # use, i.e. don't skip the full RPATH for the build tree
-  SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+############################################################################
+#####
+#####         Compile hex2tet libraries
+#####
+############################################################################
+OPTION ( LIBHEX2TET_STATIC "Compile the hex2tet static library" OFF)
+OPTION ( LIBHEX2TET_SHARED "Compile the hex2tet shared library" OFF)
 
-  # when building, don't use the install RPATH already
-  # (but later on when installing)
-  SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+# Compile static library
+IF ( LIBHEX2TET_STATIC )
+  ADD_AND_INSTALL_LIBRARY ( lib${PROJECT_NAME}_a STATIC
+    "${library_files}" ${PROJECT_NAME} )
+ENDIF()
 
-  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# Compile shared library
+IF ( LIBHEX2TET_SHARED )
+  ADD_AND_INSTALL_LIBRARY ( lib${PROJECT_NAME}_so SHARED
+    "${library_files}" ${PROJECT_NAME} )
+ENDIF()
 
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# hex2tet header files needed for library
+SET( h2t_headers
+  ${H2T_SOURCE_DIR}/libhex2tet.h
+  ${H2T_BUILD_DIR}/libhex2tetf.h
+  )
 
-  # the RPATH to be used when installing, but only if it's not a system
-  # directory
-  LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-    "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-  IF("${isSystemDir}" STREQUAL "-1")
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-  ENDIF("${isSystemDir}" STREQUAL "-1")
+# Install header files in /usr/local or equivalent
+INSTALL(FILES ${h2t_headers} DESTINATION include/hex2tet COMPONENT headers)
 
-  ############################################################################
-  #####
-  #####         Compile hex2tet libraries
-  #####
-  ############################################################################
-  SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
+COPY_FORTRAN_HEADER_AND_CREATE_TARGET ( ${H2T_BUILD_DIR} ${H2T_INCLUDE} hex2tet )
 
-  OPTION ( LIBH2T_STATIC "Compile static library" ON)
-  IF ( LIBH2T_STATIC )
-    ADD_LIBRARY(${PROJECT_NAME}_a  STATIC
-      ${source_files} ${lib_file} )
-    SET_TARGET_PROPERTIES(${PROJECT_NAME}_a PROPERTIES OUTPUT_NAME
-      ${PROJECT_NAME})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME}_a ${LIBRARIES})
-    INSTALL(FILES ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.h DESTINATION
-      include)
-    INSTALL(TARGETS ${PROJECT_NAME}_a
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib)
-  ENDIF()
+# Copy header files in project directory at configuration step
+# (generated file don't exists yet or are outdated)
+FILE(INSTALL  ${h2t_headers} DESTINATION ${H2T_INCLUDE}
+  PATTERN "libhex2tet*f.h"  EXCLUDE)
 
-  # Compile shared library
-  OPTION ( LIBH2T_SHARED "Compile dynamic library" OFF)
-  IF ( LIBH2T_SHARED )
-    ADD_LIBRARY(${PROJECT_NAME}_so SHARED
-      ${source_files} ${lib_file})
-    SET_TARGET_PROPERTIES(${PROJECT_NAME}_so PROPERTIES
-      OUTPUT_NAME ${PROJECT_NAME})
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME}_so ${LIBRARIES})
-    INSTALL(FILES ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.h
-      DESTINATION include)
-    INSTALL(TARGETS ${PROJECT_NAME}_so
-      ARCHIVE DESTINATION
-      LIBRARY DESTINATION lib)
-  ENDIF()
+############################################################################
+#####
+#####         Compile program to test library
+#####
+############################################################################
 
+IF ( TEST_LIBMMG3D )
+  INCLUDE(cmake/testing/libhex2tet_tests.cmake)
+ENDIF()
 
- ###############################################################################
-  #####
-  #####         Compile H2T executable
-  #####
-  ###############################################################################
-  ADD_EXECUTABLE(${PROJECT_NAME}
- ${H2T_SOURCE_DIR}/lib${PROJECT_NAME}.h
-    ${source_files} ${main_file})
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LIBRARIES})
-  INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+###############################################################################
+#####
+#####         Compile H2T executable
+#####
+###############################################################################
+ADD_AND_INSTALL_EXECUTABLE ( ${PROJECT_NAME} "${library_files}" ${main_file} )
 
-  # in debug mode we name the executable h2t_debug
-  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX _debug)
-  # in Release mode we name the executable h2t_O3
-  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES RELEASE_POSTFIX _O3)
-  # in RelWithDebInfo mode we name the executable h2t_d
-  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES RELWITHDEBINFO_POSTFIX _O)
-  # in MinSizeRel mode we name the executable h2t_Os
-  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES MINSIZEREL_POSTFIX _Os)
+###############################################################################
+#####
+#####         Create API Documentation
+#####
+###############################################################################
+FIND_PACKAGE(Doxygen)
+IF(DOXYGEN_FOUND)
+
+  # hex2tet Documentation
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile @ONLY)
+
+  ADD_CUSTOM_TARGET(h2t_doc
+    COMMAND ${DOXYGEN_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile
+    # COMMAND ${CMAKE_COMMAND} -E chdir
+    # ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/latex make
+    # COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/latex/refman.pdf
+    # ${CMAKE_CURRENT_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/
+    COMMENT "Generating hex2tet API documentation with Doxygen.
+    Open the doc/doxygen/html/index.html file to see it." VERBATIM
+    )
+
+  ADD_CUSTOM_TARGET(doc
+    DEPENDS h2t_doc
+    COMMENT "Generating hex2tet API documentation with Doxygen.
+     Open the doc/doxygen/html/index.html file to see it" VERBATIM
+    )
+ENDIF ( DOXYGEN_FOUND )
+
+OPTION ( BUILD_TESTING "Enable / Disable tests" OFF )
+INCLUDE( ${CMAKE_SOURCE_DIR}/cmake/testing/h2t_tests.cmake )
