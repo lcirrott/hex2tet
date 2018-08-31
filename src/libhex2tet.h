@@ -54,6 +54,14 @@ extern "C" {
  *
  * main library function: cut hexa into tetra.
  *
+ * \remark Fortran interface:
+ * >   SUBROUTINE H2T_LIBHEX2TET(mmgMesh,hexa,nbHexa,retval)\n
+ * >     MMG5_DATA_PTR_T,INTENT(INOUT)     :: mesh\n
+ * >     INTEGER, DIMENSION(*), INTENT(IN) :: hexa\n
+ * >     INTEGER, INTENT(IN)               :: nbHexa\n
+ * >     INTEGER, INTENT(OUT)              :: retval\n
+ * >   END SUBROUTINE\n
+ *
  */
 int H2T_libhex2tet(MMG5_pMesh mmgMesh,int* hexa,int nbhexa );
 
