@@ -6,11 +6,11 @@
 #
 ###############################################################################
 #
-#   A script that converts <libmmg*.h> file into a Fortran include file.
+#   A script that converts <libhex2tet*.h> file into a Fortran include file.
 #
 #   Usage:
-#    > ./genfort.pl -f libmmg*.h
-#    >    converts the libmmg*.h into a fortran header.
+#    > ./genfort.pl -f libhex2tet*.h
+#    >    converts the libhex2tet*.h into a fortran header.
 #    >     -h          Shows this help
 #    >     -r <size>   Defines REAL kind (4 or 8 usually)
 #    >     -s <size>   Defines MMG_INT  kind (4 or 8 usually)
@@ -34,7 +34,7 @@ use Getopt::Std;
 #     Kind of the MMG_INT
 #
 #   string: fichier
-#     Path to the <libmmg*.h> file
+#     Path to the <libhex2tet*.h> file
 #
 #   string: format
 #     Format to print PARAMETERs.
@@ -60,8 +60,8 @@ my %opts;
 #
 sub Usage {
 
-    print "./genfort.pl -f libmmg*.h\n";
-    print "  converts the file libmmg*.h into a fortran header.\n";
+    print "./genfort.pl -f libhex2tet*.h\n";
+    print "  converts the file libhex2tet*.h into a fortran header.\n";
     print "   -h          Shows this help\n";
     print "   -r <size>   Defines COEF/REAL kind (4 or 8 usually)\n";
     print "   -s <size>   Defines INT kind (4 or 8 usually)\n";
@@ -118,7 +118,7 @@ sub printTab # ($chaine, $tabcount, $comm)
 #
 # Main function.
 #
-# Converts the header <libmmg*.h> file into a Fortran include.
+# Converts the header <libhex2tet*.h> file into a Fortran include.
 #
 sub Convert {
 

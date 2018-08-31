@@ -51,23 +51,21 @@
 int main (int argc, char ** argv)
 {
   char * header_f       = NULL;
-  char * libmmg_h       = NULL;
-  char * libmmg_include = NULL;
+  char * libh2t_h       = NULL;
   char * genfort        = NULL;
   char * cmd            = NULL;
   FILE * file           = NULL;
 
-  if (argc != 5)
+  if (argc != 4)
     {
       fprintf(stderr, "usage : %s headerNameFortran.h headerNameC.h"
-              " libmmgtypesf_include_dir genfort.pl\n",argv[0]);
+              " genfort.pl\n",argv[0]);
       return EXIT_FAILURE;
     }
 
   header_f       = argv[1];
-  libmmg_h       = argv[2];
-  libmmg_include = argv[3];
-  genfort        = argv[4];
+  libh2t_h       = argv[2];
+  genfort        = argv[3];
 
   /* Fortran header */
   file = fopen (header_f,"w");
@@ -80,34 +78,28 @@ int main (int argc, char ** argv)
   fprintf(file,"! ** and the \"genfort.pl\" script (scripts directory).\n");
   fprintf(file,"! ** Do not modified it by hand, it will be discarded.\n");
   fprintf(file,"! **\n");
-  fprintf(file,"! ** This scripts recopy the macros of the libmmg*.h file\n");
+  fprintf(file,"! ** This scripts recopy the macros of the libhex2tet*.h file\n");
   fprintf(file,"! ** and convert enumerations into macros.\n");
   fprintf(file,"! **\n");
   fprintf(file,"! ** Note: \"genfort.pl\" is automatically called by the ");
   fprintf(file,"\"genheader.c\"\n! ** executable code.\n");
   fprintf(file,"! **\n");
-  fprintf(file,"! ** See the \"libmmg*.h\" file for a correct displaying of"
+  fprintf(file,"! ** See the \"libhex2tet*.h\" file for a correct displaying of"
           " the documentation.\n");
   fprintf(file,"! */\n\n");
 
-  /* Include libmmgtypesf.h if needed. */
-  if(strstr(libmmg_h,"libmmgtypes.h")==NULL) {
-    fprintf(file,"#include \"%s/libmmgtypesf.h\"\n\n",libmmg_include);
-  }
-  else {
-    /* Compute the size of the C pointer for the Fortran programm */
-    fprintf(file, "#define MMG5_DATA_PTR_T INTEGER(kind=%d)\n",
-            (int)sizeof(void*));
-  }
+  fprintf(file, "#include \"mmg/mmg3d/libmmg3df.h\"\n");
+
+ 
   fclose(file);
 
   /* Generate Fortran header */
   if (NULL == (cmd = (char*)malloc((strlen(genfort)+
-                                    strlen(libmmg_h)+
+                                    strlen(libh2t_h)+
                                     strlen(header_f)+128)*sizeof(char))))
     return EXIT_FAILURE;
   sprintf(cmd, "perl %s -f %s >> %s;",
-          genfort, libmmg_h, header_f);
+          genfort, libh2t_h, header_f);
   fprintf(stdout, "%s\n", cmd);
   if (-1 == system(cmd))
     return EXIT_FAILURE;

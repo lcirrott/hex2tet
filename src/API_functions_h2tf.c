@@ -53,3 +53,14 @@ FORTRAN_NAME(H2T_SET_VERTEX,h2t_set_vertex,
   *retval = H2T_Set_vertex(*mesh,*c0,*c1,*c2,*ref,*pos);
   return;
 }
+
+/**
+ * See \ref H2T_libhex2tet function in \ref libhex2tet.h file.
+ */
+FORTRAN_NAME(H2T_LIBHEX2TET,h2t_libhex2tet,
+             (MMG5_pMesh *mmgMesh, int *hexa, int* nbHexa, int* retval),
+             (mmgMesh,hexa,nbHexa,retval)) {
+
+  *retval = H2T_libhex2tet(*mmgMesh,hexa,*nbHexa);
+  return;
+}

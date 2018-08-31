@@ -56,7 +56,7 @@ extern "C" {
  *
  * \remark Fortran interface:
  * >   SUBROUTINE H2T_LIBHEX2TET(mmgMesh,hexa,nbHexa,retval)\n
- * >     MMG5_DATA_PTR_T,INTENT(INOUT)     :: mesh\n
+ * >     MMG5_DATA_PTR_T,INTENT(INOUT)     :: mmgMesh\n
  * >     INTEGER, DIMENSION(*), INTENT(IN) :: hexa\n
  * >     INTEGER, INTENT(IN)               :: nbHexa\n
  * >     INTEGER, INTENT(OUT)              :: retval\n
@@ -125,7 +125,7 @@ int H2T_libhex2tet(MMG5_pMesh mmgMesh,int* hexa,int nbhexa );
  * at position \a pos in mesh structure
  *
  * \remark Fortran interface:
- * >   SUBROUTINE MMG3D_SET_VERTEX(mesh,c0,c1,c2,ref,pos,retval)\n
+ * >   SUBROUTINE H2T_SET_VERTEX(mesh,c0,c1,c2,ref,pos,retval)\n
  * >     MMG5_DATA_PTR_T,INTENT(INOUT) :: mesh\n
  * >     REAL(KIND=8), INTENT(IN)      :: c0,c1,c2\n
  * >     INTEGER, INTENT(IN)           :: ref,pos\n

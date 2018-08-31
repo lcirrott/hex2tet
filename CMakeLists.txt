@@ -112,7 +112,6 @@ ADD_EXECUTABLE(genheader ${PROJECT_SOURCE_DIR}/scripts/genheader.c)
 TARGET_LINK_LIBRARIES ( genheader ${LIBRARIES}  )
 GENERATE_FORTRAN_HEADER ( hex2tet
   ${H2T_SOURCE_DIR} libhex2tet.h
-  ${H2T_BUILD_DIR}
   ${H2T_BUILD_DIR} libhex2tetf.h
   )
 
@@ -273,7 +272,7 @@ FILE(INSTALL  ${h2t_headers} DESTINATION ${H2T_INCLUDE}
 ############################################################################
 
 IF ( TEST_LIBMMG3D )
-  INCLUDE(cmake/testing/libhex2tet_tests.cmake)
+  INCLUDE(cmake/testing/h2t_tests.cmake)
 ENDIF()
 
 ###############################################################################

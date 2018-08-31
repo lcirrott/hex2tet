@@ -28,7 +28,8 @@ int H2T_libhex2tet(MMG5_pMesh mmgMesh,int* hexa,int nbhexa) {
 
   /* chk orientation */
   norient = H2T_chkorient(mmgMesh,hexa,nbhexa);
-  fprintf(stdout,"\n  -- WARNING: %8d HEXA REORIENTED\n",norient);
+  if ( norient )
+    fprintf(stdout,"\n  -- WARNING: %8d HEXA REORIENTED\n",norient);
 
   /* hexa adjacency */
   adjahex = NULL;

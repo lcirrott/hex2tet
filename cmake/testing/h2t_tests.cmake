@@ -16,15 +16,36 @@ IF ( BUILD_TESTING )
       " shared ${PROJECT_NAME} library to compile this tests." )
   ENDIF ( )
 
+  IF ( LIBHEX2TET_STATIC OR LIBHEX2TET_SHARED )
 
-  IF ( ${lib_name} )
-    SET ( test_name  libhex2tet_C_example )
-    SET ( main_path  ${LIB_DIR}/C/ex1.c )
-    SET ( out_file    "${CTEST_OUTPUT_DIR}/ex1.o.mesh" )
+    SET ( H2T_LIB_TESTS            libhex2tet_C_example )
+    SET ( H2T_LIB_TESTS_MAIN_PATH  ${LIB_DIR}/C/ex1.c   )
+    SET ( H2T_LIB_TESTS_OUTPUTMESH "${CTEST_OUTPUT_DIR}/ex1-C.o.mesh" )
 
-    ADD_LIBRARY_TEST ( ${test_name} ${main_path} "copy_hex2tet_headers" "${lib_name}" )
-    ADD_TEST ( NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}> ${out_file} )
+    IF ( CMAKE_Fortran_COMPILER )
+      ENABLE_LANGUAGE ( Fortran )
+
+      MESSAGE ( ${lib_name} )
+
+      LIST ( APPEND H2T_LIB_TESTS            libhex2tet_Fortran_example )
+      LIST ( APPEND H2T_LIB_TESTS_MAIN_PATH  ${LIB_DIR}/Fortran/ex1.F90 )
+      LIST ( APPEND H2T_LIB_TESTS_OUTPUTMESH "${CTEST_OUTPUT_DIR}/ex1-Fortran.o.mesh" )
+
+    ENDIF ( )
+
+    LIST(LENGTH H2T_LIB_TESTS nbTests_tmp)
+    MATH(EXPR nbTests "${nbTests_tmp} - 1")
+
+    FOREACH ( test_idx RANGE ${nbTests} )
+      LIST ( GET H2T_LIB_TESTS            ${test_idx} test_name )
+      LIST ( GET H2T_LIB_TESTS_MAIN_PATH  ${test_idx} main_path )
+      LIST ( GET H2T_LIB_TESTS_OUTPUTMESH ${test_idx} out_file )
+
+
+      ADD_LIBRARY_TEST ( ${test_name} ${main_path} "copy_hex2tet_headers" "${lib_name}" )
+      ADD_TEST ( NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}> ${out_file} )
+    ENDFOREACH ( )
+
   ENDIF ( )
-
 
 ENDIF ( )

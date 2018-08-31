@@ -49,9 +49,9 @@ int main ( int argc, char* argv[] ) {
   int nbVertices = Width*Height*Depth;
   int nbHex = (Width - 1)    * (Height - 1) * (Depth-1);
 
-  H2T_Init_mesh(MMG5_ARG_start,
-                MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
-                MMG5_ARG_end);
+  MMG3D_Init_mesh(MMG5_ARG_start,
+                  MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
+                  MMG5_ARG_end);
 
   /** Step 2: Set the mesh size by giving the number of vertices and
    * the number of hexa of the hexahedral mesh */
@@ -129,6 +129,10 @@ int main ( int argc, char* argv[] ) {
   }
 
   free(hexTab);
+
+  MMG3D_Free_all(MMG5_ARG_start,
+                 MMG5_ARG_ppMesh,&mmgMesh,MMG5_ARG_ppMet,&mmgSol,
+                 MMG5_ARG_end);
 
   return ier;
 }
