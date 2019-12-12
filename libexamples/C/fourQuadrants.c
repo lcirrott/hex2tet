@@ -192,18 +192,17 @@ int main ( int argc, char* argv[] ) {
 
 
   if ( ier != H2T_STRONGFAILURE ) {
+    /* Save mesh and solution */
     MMG3D_saveMesh(mmgMesh,fileout);
+    MMG3D_saveSol(mmgMesh,mmgSol,fileout);
+    /* Save custom mesh partitioning in a separate file */
     FILE *fid;
-    fid = fopen(strcat(fileout,".sol"),"w");
+    fid = fopen(strcat(fileout,"-part.sol"),"w");
     fprintf(fid,"MeshVersionFormatted 2\nDimension\n3");
-//    fprintf(fid,"\nSolAtVertices\n%d\n1 1\n",mmgMesh->np);
-//    for( int k = 1; k <= mmgMesh->np; k++ )
-//      fprintf(fid,"%f\n",mmgSol->m[k]);
     fprintf(fid,"\nSolAtTetrahedra\n%d\n1 1\n",mmgMesh->ne);
     for( int k = 1; k <= mmgMesh->ne; k++ )
-      fprintf(fid,"%f\n",part[k]);
+      fprintf(fid,"%f\n",(double)part[k]);
     fclose(fid);
-//    MMG3D_saveSol(mmgMesh,mmgSol,fileout);
   }
   else {
     printf("Hex2tet Fail: unable to save mesh.\n");
