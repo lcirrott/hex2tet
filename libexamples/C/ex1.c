@@ -105,15 +105,9 @@ int main ( int argc, char* argv[] ) {
         bul = ((k+1) * imax * jmax) + ((j+1) * imax) + i + 1;
         bur = bul + 1;
 
-        hexTab[hexTabPosition]   = fdl;
-        hexTab[hexTabPosition+1] = fdr;
-        hexTab[hexTabPosition+2] = bdr;
-        hexTab[hexTabPosition+3] = bdl;
-        hexTab[hexTabPosition+4] = ful;
-        hexTab[hexTabPosition+5] = fur;
-        hexTab[hexTabPosition+6] = bur;
-        hexTab[hexTabPosition+7] = bul;
-        hexTab[hexTabPosition+8] = ref;
+        if( H2T_Set_hexahedron(hexTab,fdl,fdr,bdr,bdl,ful,fur,bur,bul,
+                               ref,hexaNumber) != 1 )
+          exit ( EXIT_FAILURE );
       }
     }
   }
