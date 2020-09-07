@@ -121,7 +121,7 @@ int  H2T_Set_meshSize(MMG5_pMesh mesh,int np,int nhexa,int nquad,int na) {
 
   ne = 6*nhexa;
 
-  if(MMG3D_Set_meshSize(mesh, np, 6*nhexa, 0, 0, nquad, 0) != 1)
+  if(MMG3D_Set_meshSize(mesh, np, 6*nhexa, 0, 2*nquad, nquad, 0) != 1)
     return 0;
 
   if ( na ) {
