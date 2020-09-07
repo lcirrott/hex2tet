@@ -121,12 +121,12 @@ int  H2T_Set_meshSize(MMG5_pMesh mesh,int np,int nhexa,int nquad,int na) {
 
   ne = 6*nhexa;
 
-  if(MMG3D_Set_meshSize(mesh, np, 6*nhexa, 0, 0, 0, 0) != 1)
+  if(MMG3D_Set_meshSize(mesh, np, 6*nhexa, 0, 0, nquad, 0) != 1)
     return 0;
 
-  if ( nquad || na ) {
-    printf("  ## Warning: %s: treatment of input quadrangles and edges not yet implemented:\n"
-           "%d quadrangles and %d edges ignored.\n",__func__,nquad,na);
+  if ( na ) {
+    printf("  ## Warning: %s: treatment of input edges not yet implemented:\n"
+           "%d edges ignored.\n",__func__,na);
   }
 
   /* Set all tetra as unused */
@@ -164,18 +164,9 @@ int  H2T_Set_hexahedron(int *hexTab,
   return 1;
 }
 
-int  H2T_Set_quadrilateral(int *quadTab,
+int  H2T_Set_quadrilateral(MMG5_pMesh mesh,
                            int i0,int i1,int i2,int i3,
                            int ref,int pos) {
-  int quadTabPosition;
 
-  quadTabPosition = 5*pos;
-
-  quadTab[quadTabPosition]   = i0;
-  quadTab[quadTabPosition+1] = i1;
-  quadTab[quadTabPosition+2] = i2;
-  quadTab[quadTabPosition+3] = i3;
-  quadTab[quadTabPosition+4] = ref;
-
-  return 1;
+  return MMG3D_Set_quadrilateral(mesh,i0,i1,i2,i3,ref,pos);
 }
