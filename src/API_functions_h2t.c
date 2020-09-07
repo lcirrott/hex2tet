@@ -163,3 +163,19 @@ int  H2T_Set_hexahedron(int *hexTab,
 
   return 1;
 }
+
+int  H2T_Set_quadrilateral(int *quadTab,
+                           int i0,int i1,int i2,int i3,
+                           int ref,int pos) {
+  int quadTabPosition;
+
+  quadTabPosition = 5*pos;
+
+  quadTab[quadTabPosition]   = i0;
+  quadTab[quadTabPosition+1] = i1;
+  quadTab[quadTabPosition+2] = i2;
+  quadTab[quadTabPosition+3] = i3;
+  quadTab[quadTabPosition+4] = ref;
+
+  return 1;
+}

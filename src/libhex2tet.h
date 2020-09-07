@@ -166,6 +166,31 @@ int H2T_libhex2tet(MMG5_pMesh mmgMesh,int* hexa,int nbhexa );
   int  H2T_Set_hexahedron(int *hexTab,int i0,int i1,int i2,int i3,int i4,int i5,
                           int i6,int i7,int ref,int pos);
 
+/**
+ * \param quadTab pointer toward the quadrilaterals table.
+ * \param i0 first quadrilateral vertex.
+ * \param i1 second quadrilateral vertex.
+ * \param i2 third quadrilateral vertex.
+ * \param i3 fourth quadrilateral vertex.
+ * \param ref quadrilateral reference.
+ * \param pos position of the quadrilateral in the mesh.
+ * \return 1.
+ *
+ * Set quadrilateral with vertices \a i0,\a i1,\a i2,\a i3 and reference \a ref
+ * at position \a pos in quadrilaterals table.
+ *
+ * \remark Fortran interface:
+ * >   SUBROUTINE H2T_SET_QUADRILATERAL(quadTab,i0,i1,i2,i3,ref,pos,retval)\n
+ * >     INTEGER, DIMENSION(:), INTENT(INOUT) :: quadTab\n
+ * >     INTEGER, INTENT(IN)                  :: i0,i1,i2,i3\n
+ * >     INTEGER, INTENT(IN)                  :: ref,pos\n
+ * >     INTEGER, INTENT(OUT)                 :: retval\n
+ * >   END SUBROUTINE\n
+ *
+ */
+  int  H2T_Set_quadrilateral(int *quadTab,int i0,int i1,int i2,int i3,int ref,
+                             int pos);
+
 #ifdef __cplusplus
 }
 #endif

@@ -68,6 +68,19 @@ FORTRAN_NAME(H2T_SET_HEXAHEDRON,h2t_set_hexahedron,
 }
 
 /**
+ * See \ref H2T_Set_quadrilateral function in \ref libhex2tet.h file.
+ */
+FORTRAN_NAME(H2T_SET_QUADRILATERAL,h2t_set_quadrilateral,
+             (int *quadTab,
+              int* i0,int* i1,int* i2,int* i3,
+              int* ref,int* pos,int* retval),
+             (quadTab,i0,i1,i2,i3,ref,pos,retval)) {
+
+  *retval = H2T_Set_quadrilateral(quadTab,*i0,*i1,*i2,*i3,*ref,*pos);
+  return;
+}
+
+/**
  * See \ref H2T_libhex2tet function in \ref libhex2tet.h file.
  */
 FORTRAN_NAME(H2T_LIBHEX2TET,h2t_libhex2tet,
