@@ -60,6 +60,7 @@
  *
  * Hash edges or faces.
  *
+ * \remark Modeled after MMG5_hashNew.
  */
 int H2T_hashNew(MMG5_pMesh mesh,MMG5_Hash *hash,int hsiz,int hmax) {
   int   k;
@@ -88,6 +89,7 @@ int H2T_hashNew(MMG5_pMesh mesh,MMG5_Hash *hash,int hsiz,int hmax) {
  * \return 0 if fail, -1 if the face is newly hashed, index of the first face
  * hashed if another face with same vertices exist.
  *
+ * \remark Modeled after MMG5_hashFace.
  *
  **/
 int H2T_hashFace(MMG5_pMesh mesh,MMG5_Hash *hash,int ia,int ib,int ic,int k) {
@@ -143,7 +145,20 @@ int H2T_hashFace(MMG5_pMesh mesh,MMG5_Hash *hash,int ia,int ib,int ic,int k) {
   return -1;
 }
 
-/** return index of triangle ia ib ic */
+/**.
+ * \param hash pointer toward the hash table.
+ * \param ia first triangle vertex
+ * \param ib second triangle vertex
+ * \param ic third triangle vertex
+ *
+ * \return 0 if failed, the index of the triangle otherwise.
+ *
+ * Look for the triangle with vertices (ia,ib,ic) in the hash table, and return
+ * its index.
+ *
+ * \remark Modeled after MMG5_hashGetFace.
+ *
+ */
 int H2T_hashGetFace(MMG5_Hash *hash,int ia,int ib,int ic) {
   MMG5_hedge  *ph;
   int     key,mins,maxs,sum;
@@ -172,6 +187,16 @@ int H2T_hashGetFace(MMG5_Hash *hash,int ia,int ib,int ic) {
   return 0;
 }
 
+/**
+ * \param mesh pointer toward the mesh structure.
+ * \param hash pointer toward the hash table.
+ *
+ * \return 0 if failed, 1 otherwise.
+ *
+ * Hash all possible triangles that could be created from input boundary
+ * quadrilaterals (4*nquad) and store them with index 4*quad_id+i.
+ *
+ */
 int H2T_hashQuad(MMG5_pMesh mesh,MMG5_Hash *hash) {
   MMG5_pQuad pq;
   int k;
@@ -212,14 +237,26 @@ int H2T_hashQuad(MMG5_pMesh mesh,MMG5_Hash *hash) {
   return 1;
 }
 
+/**
+ * \param mesh pointer toward the mesh structure.
+ * \param hash pointer toward the hash table.
+ *
+ * \return 0 if failed, 1 otherwise.
+ *
+ * If a boundary triangles is found in the hash table, add it to the mesh and
+ * give it the reference of the corresponding input boundary quadrilateral.
+ *
+ */
 int H2T_hashGetRef(MMG5_pMesh mesh,MMG5_Hash *hash) {
   MMG5_pTetra pt;
   int         *adja;
   int         ie,i,nt,ia,ib,ic,k,ref;
 
+  /* Create tetrahedra adjacency */
   if( !MMG3D_hashTetra(mesh,0) ) return 0;
   assert(mesh->adja);
 
+  /* Look for boundary triangles in the hash table */
   nt = 0;
   for( ie = 1; ie <= mesh->ne; ie++ ){
     pt = &mesh->tetra[ie];

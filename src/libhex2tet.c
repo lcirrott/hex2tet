@@ -32,6 +32,7 @@ int H2T_libhex2tet(MMG5_pMesh mmgMesh,int* hexa,int nbhexa) {
   if ( norient )
     fprintf(stdout,"\n  -- WARNING: %8d HEXA REORIENTED\n",norient);
 
+  /* hash boundary quadrilaterals */
   if(!H2T_hashQuad(mmgMesh,&hash)) return H2T_STRONGFAILURE;
 
   /* hexa adjacency */
